@@ -31,7 +31,7 @@ to quickly create a Cobra application.`,
 func read(cmd *cobra.Command, args []string) {
 	// Identify type of secret vault
 	secretRef := args[0]
-	vaultType := core.ParseVualtType(secretRef)
+	vaultType := core.ParseVaultType(secretRef)
 
 	var secret string
 	var err error

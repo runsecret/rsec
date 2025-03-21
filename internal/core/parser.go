@@ -1,10 +1,14 @@
 package core
 
 import (
+	"fmt"
 	"regexp"
+	"strings"
+
+	"github.com/devenjarvis/signet/internal/aws"
 )
 
-func ParseVualtType(secretRef string) VaultType {
+func ParseVaultType(secretRef string) VaultType {
 	awsArnRegex := regexp.MustCompile(`arn:aws.*`)
 
 	switch {
@@ -13,4 +17,30 @@ func ParseVualtType(secretRef string) VaultType {
 	default:
 		return VaultTypeUnknown
 	}
+}
+
+func ReplaceEnvVarSecrets(envVars []string) ([]string, error) {
+	for i, envVar := range envVars {
+		parts := strings.SplitN(envVar, "=", 2)
+		key := strings.TrimSpace(parts[0])
+		value := strings.TrimSpace(parts[1])
+
+		var secret string
+		var err error
+		switch ParseVaultType(value) {
+		case VaultTypeAws:
+			secret, err = aws.GetSecret(value)
+		case VaultTypeUnknown:
+			// Leave it alone
+			continue
+		}
+
+		if err != nil {
+			return envVars, err
+		}
+
+		envVars[i] = fmt.Sprintf("%s=%s", key, secret)
+	}
+
+	return envVars, nil
 }
