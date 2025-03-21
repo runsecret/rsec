@@ -15,8 +15,8 @@ import (
 var OutFilePath string
 
 // showCmd represents the show command
-var showCmd = &cobra.Command{
-	Use:   "show",
+var getCmd = &cobra.Command{
+	Use:   "get",
 	Args:  cobra.MatchAll(cobra.ExactArgs(1), cobra.OnlyValidArgs),
 	Short: "A brief description of your command",
 	Long: `A longer description that spans multiple lines and likely contains examples
@@ -25,10 +25,10 @@ and usage of using your command. For example:
 Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
-	Run: show,
+	Run: get,
 }
 
-func show(cmd *cobra.Command, args []string) {
+func get(cmd *cobra.Command, args []string) {
 	// Identify type of secret vault
 	secretRef := args[0]
 	vaultType := core.ParseVaultType(secretRef)
@@ -64,7 +64,7 @@ func show(cmd *cobra.Command, args []string) {
 }
 
 func init() {
-	rootCmd.AddCommand(showCmd)
+	rootCmd.AddCommand(getCmd)
 
-	showCmd.Flags().StringVarP(&OutFilePath, "out", "o", "", "File to write secret to")
+	getCmd.Flags().StringVarP(&OutFilePath, "out", "o", "", "File to write secret to")
 }
