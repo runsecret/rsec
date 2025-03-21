@@ -13,5 +13,4 @@ func ParseVualtType(secretRef string) VaultType {
 	default:
 		return VaultTypeUnknown
 	}
-
 }

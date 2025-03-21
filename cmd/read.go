@@ -5,11 +5,14 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/devenjarvis/signet/internal/aws"
 	"github.com/devenjarvis/signet/internal/core"
 	"github.com/spf13/cobra"
 )
+
+var OutFilePath string
 
 // readCmd represents the read command
 var readCmd = &cobra.Command{
@@ -47,10 +50,21 @@ func read(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	// Else print the secret
-	fmt.Println(secret)
+	// If the --out flag is used write the secret to a file
+	if OutFilePath != "" {
+		err := os.WriteFile(OutFilePath, []byte(secret), 0644)
+		if err != nil {
+			fmt.Println("Error writing to file:", err)
+			return
+		}
+	} else {
+		// Else just print it
+		fmt.Println(secret)
+	}
 }
 
 func init() {
 	rootCmd.AddCommand(readCmd)
+
+	readCmd.Flags().StringVarP(&OutFilePath, "out", "o", "", "File to write secret to")
 }
