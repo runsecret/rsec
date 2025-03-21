@@ -9,7 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/secretsmanager"
 )
 
-// secretName eample: arn:aws:secretsmanager:us-east-2:111122223333:secret:SecretName-abcdef
+// secretName example: arn:aws:secretsmanager:us-east-2:111122223333:secret:SecretName-abcdef
 func GetSecret(secretName string) (string, error) {
 	// Point to localstack
 	awsEndpoint := "http://localhost:4566"

@@ -7,6 +7,7 @@ import (
 	"fmt"
 
 	"github.com/devenjarvis/signet/internal/aws"
+	"github.com/devenjarvis/signet/internal/core"
 	"github.com/spf13/cobra"
 )
 
@@ -25,24 +26,31 @@ to quickly create a Cobra application.`,
 }
 
 func read(cmd *cobra.Command, args []string) {
-	secret, err := aws.GetSecret(args[0])
+	// Identify type of secret vault
+	secretRef := args[0]
+	vaultType := core.ParseVualtType(secretRef)
+
+	var secret string
+	var err error
+
+	// Get secret based on vault type
+	switch vaultType {
+	case core.VaultTypeAws:
+		secret, err = aws.GetSecret(args[0])
+	default:
+		fmt.Println("Error: unimplemented vault type")
+	}
+
+	// If getting the secret failed, print the error
 	if err != nil {
 		fmt.Printf("Error: %s", err)
 		return
 	}
-	fmt.Printf("Secret: %s", secret)
+
+	// Else print the secret
+	fmt.Println(secret)
 }
 
 func init() {
 	rootCmd.AddCommand(readCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// readCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// readCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
