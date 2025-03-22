@@ -1,4 +1,4 @@
-package envvars
+package secretref
 
 type VaultType int
 

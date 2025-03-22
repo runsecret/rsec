@@ -2,28 +2,17 @@ package envvars
 
 import (
 	"fmt"
-	"regexp"
 	"strings"
 
 	"github.com/devenjarvis/signet/internal/aws"
+	"github.com/devenjarvis/signet/internal/secretref"
 )
 
-func ParseVaultType(secretRef string) VaultType {
-	awsArnRegex := regexp.MustCompile(`arn:aws.*`)
-
-	switch {
-	case awsArnRegex.MatchString(secretRef):
-		return VaultTypeAws
-	default:
-		return VaultTypeUnknown
-	}
-}
-
 func GetSecret(secretRef string) (secret string, err error) {
-	vaultType := ParseVaultType(secretRef)
+	vaultType := secretref.ParseVaultType(secretRef)
 
 	switch vaultType {
-	case VaultTypeAws:
+	case secretref.VaultTypeAws:
 		secret, err = aws.GetSecret(secretRef)
 	default:
 		// Do nothing
