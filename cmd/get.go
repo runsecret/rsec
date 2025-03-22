@@ -8,7 +8,7 @@ import (
 	"os"
 
 	"github.com/devenjarvis/signet/internal/aws"
-	"github.com/devenjarvis/signet/internal/core"
+	"github.com/devenjarvis/signet/internal/envvars"
 	"github.com/spf13/cobra"
 )
 
@@ -31,14 +31,14 @@ to quickly create a Cobra application.`,
 func get(cmd *cobra.Command, args []string) {
 	// Identify type of secret vault
 	secretRef := args[0]
-	vaultType := core.ParseVaultType(secretRef)
+	vaultType := envvars.ParseVaultType(secretRef)
 
 	var secret string
 	var err error
 
 	// Get secret based on vault type
 	switch vaultType {
-	case core.VaultTypeAws:
+	case envvars.VaultTypeAws:
 		secret, err = aws.GetSecret(args[0])
 	default:
 		fmt.Println("Error: unimplemented vault type")

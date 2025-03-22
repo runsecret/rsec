@@ -1,4 +1,4 @@
-package core
+package envvars
 
 import (
 	"fmt"
@@ -19,7 +19,7 @@ func ParseVaultType(secretRef string) VaultType {
 	}
 }
 
-func ReplaceEnvVarSecrets(rawEnv []string) (envVars []string, secrets []string, err error) {
+func SetSecrets(rawEnv []string) (envVars []string, redactList []string, err error) {
 	envVars = rawEnv
 	for i, envVar := range envVars {
 		parts := strings.SplitN(envVar, "=", 2)
@@ -39,9 +39,11 @@ func ReplaceEnvVarSecrets(rawEnv []string) (envVars []string, secrets []string, 
 			return
 		}
 
+		// Replace the secret in the env var
 		envVars[i] = fmt.Sprintf("%s=%s", key, secret)
-		// Add secret to list of secrets
-		secrets = append(secrets, secret)
+
+		// Add secret to list of secrets for redaction
+		redactList = append(redactList, secret)
 	}
 
 	return

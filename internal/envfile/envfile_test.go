@@ -1,12 +1,12 @@
-package core
+package envfile
 
 import (
 	"reflect"
 	"testing"
 )
 
-// Test ReadEnvFile
-func TestReadEnvFile(t *testing.T) {
+// Test Read
+func TestRead(t *testing.T) {
 	// Test cases
 	tests := []struct {
 		name    string
@@ -40,7 +40,7 @@ func TestReadEnvFile(t *testing.T) {
 	// Run tests
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := ReadEnvFile(tt.path)
+			got, err := Read(tt.path)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ReadEnvFile() error = %v, wantErr %v", err, tt.wantErr)
 				return

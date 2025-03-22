@@ -10,7 +10,9 @@ import (
 	"os/exec"
 
 	"github.com/creack/pty"
-	"github.com/devenjarvis/signet/internal/core"
+	"github.com/devenjarvis/signet/internal/envfile"
+	"github.com/devenjarvis/signet/internal/envvars"
+	"github.com/devenjarvis/signet/internal/redact"
 	"github.com/spf13/cobra"
 )
 
@@ -38,7 +40,7 @@ func run(cmd *cobra.Command, args []string) {
 
 	// If --env flag used, load env vars from file
 	if EnvFilePath != "" {
-		fileEnviron, err := core.ReadEnvFile(EnvFilePath)
+		fileEnviron, err := envfile.Read(EnvFilePath)
 		if err != nil {
 			fmt.Println(err)
 			return
@@ -47,7 +49,7 @@ func run(cmd *cobra.Command, args []string) {
 	}
 
 	// Replace secrets in env vars
-	env, secrets, err := core.ReplaceEnvVarSecrets(cmdEnviron)
+	env, secrets, err := envvars.SetSecrets(cmdEnviron)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -78,7 +80,7 @@ func run(cmd *cobra.Command, args []string) {
 
 	// Redact secrets while preserving formatting
 	rawOutput := buf.Bytes()
-	redactedOutput := core.RedactSecrets(rawOutput, secrets)
+	redactedOutput := redact.Secrets(rawOutput, secrets)
 
 	// Print the result
 	fmt.Print(string(redactedOutput))

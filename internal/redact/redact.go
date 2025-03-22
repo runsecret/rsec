@@ -1,8 +1,8 @@
-package core
+package redact
 
 import "strings"
 
-func RedactSecrets(input []byte, secretsToRedact []string) []byte {
+func Secrets(input []byte, secretsToRedact []string) []byte {
 	result := string(input)
 
 	for _, secret := range secretsToRedact {
