@@ -4,15 +4,12 @@ Copyright © 2025 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"bytes"
 	"fmt"
-	"io"
 	"os/exec"
 
-	"github.com/creack/pty"
+	"github.com/devenjarvis/signet/internal/command"
 	"github.com/devenjarvis/signet/internal/envfile"
 	"github.com/devenjarvis/signet/internal/envvars"
-	"github.com/devenjarvis/signet/internal/redact"
 	"github.com/spf13/cobra"
 )
 
@@ -28,13 +25,10 @@ and usage of using your command. For example:
 Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
-	Run: run,
+	Run: runFunc,
 }
 
-func run(cmd *cobra.Command, args []string) {
-	// Build Command
-	userCmd := exec.Command(args[0], args[1:]...)
-
+func loadEnvVars(userCmd *exec.Cmd) ([]string, error) {
 	// Load system env vars
 	cmdEnviron := userCmd.Environ()
 
@@ -42,10 +36,23 @@ func run(cmd *cobra.Command, args []string) {
 	if EnvFilePath != "" {
 		fileEnviron, err := envfile.Read(EnvFilePath)
 		if err != nil {
-			fmt.Println(err)
-			return
+			return cmdEnviron, err
 		}
 		cmdEnviron = append(cmdEnviron, fileEnviron...)
+	}
+
+	return cmdEnviron, nil
+}
+
+func runFunc(cmd *cobra.Command, args []string) {
+	// Build Command
+	userCmd := exec.Command(args[0], args[1:]...)
+
+	// Load env vars
+	cmdEnviron, err := loadEnvVars(userCmd)
+	if err != nil {
+		fmt.Println(err)
+		return
 	}
 
 	// Replace secrets in env vars
@@ -56,31 +63,12 @@ func run(cmd *cobra.Command, args []string) {
 	}
 	userCmd.Env = env
 
-	// Start a pty
-	ptmx, err := pty.Start(userCmd)
+	// Run Command
+	redactedOutput, err := command.Run(userCmd, secrets)
 	if err != nil {
-		fmt.Printf("Error starting pty: %v\n", err)
+		fmt.Println(err)
 		return
 	}
-	defer ptmx.Close()
-
-	// Read the output
-	var buf bytes.Buffer
-	_, err = io.Copy(&buf, ptmx)
-	if err != nil {
-		fmt.Printf("Error reading output: %v\n", err)
-		return
-	}
-
-	// Wait for the command to finish
-	if err := userCmd.Wait(); err != nil {
-		fmt.Printf("Command failed: %v\n", err)
-		return
-	}
-
-	// Redact secrets while preserving formatting
-	rawOutput := buf.Bytes()
-	redactedOutput := redact.Secrets(rawOutput, secrets)
 
 	// Print the result
 	fmt.Print(string(redactedOutput))

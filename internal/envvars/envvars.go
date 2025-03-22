@@ -19,31 +19,42 @@ func ParseVaultType(secretRef string) VaultType {
 	}
 }
 
+func GetSecret(secretRef string) (secret string, err error) {
+	vaultType := ParseVaultType(secretRef)
+
+	switch vaultType {
+	case VaultTypeAws:
+		secret, err = aws.GetSecret(secretRef)
+	default:
+		// Do nothing
+	}
+
+	return
+}
+
 func SetSecrets(rawEnv []string) (envVars []string, redactList []string, err error) {
 	envVars = rawEnv
 	for i, envVar := range envVars {
+		// Split env vars
 		parts := strings.SplitN(envVar, "=", 2)
 		key := strings.TrimSpace(parts[0])
 		value := strings.TrimSpace(parts[1])
 
+		// Try to get secret from env var
 		var secret string
-		switch ParseVaultType(value) {
-		case VaultTypeAws:
-			secret, err = aws.GetSecret(value)
-		case VaultTypeUnknown:
-			// Leave it alone
-			continue
-		}
-
+		secret, err = GetSecret(value)
 		if err != nil {
 			return
 		}
 
-		// Replace the secret in the env var
-		envVars[i] = fmt.Sprintf("%s=%s", key, secret)
+		// If secret was found, replace it in the env var
+		if secret != "" {
+			// Replace the secret in the env var
+			envVars[i] = fmt.Sprintf("%s=%s", key, secret)
+			// Add secret to list of secrets for redaction
+			redactList = append(redactList, secret)
+		}
 
-		// Add secret to list of secrets for redaction
-		redactList = append(redactList, secret)
 	}
 
 	return

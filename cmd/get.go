@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/devenjarvis/signet/internal/aws"
 	"github.com/devenjarvis/signet/internal/envvars"
 	"github.com/spf13/cobra"
 )
@@ -25,32 +24,26 @@ and usage of using your command. For example:
 Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
-	Run: get,
+	Run: getFunc,
 }
 
-func get(cmd *cobra.Command, args []string) {
-	// Identify type of secret vault
-	secretRef := args[0]
-	vaultType := envvars.ParseVaultType(secretRef)
-
-	var secret string
-	var err error
-
+func getFunc(cmd *cobra.Command, args []string) {
 	// Get secret based on vault type
-	switch vaultType {
-	case envvars.VaultTypeAws:
-		secret, err = aws.GetSecret(args[0])
-	default:
-		fmt.Println("Error: unimplemented vault type")
-	}
+	secretRef := args[0]
+	secret, err := envvars.GetSecret(secretRef)
 
 	// If getting the secret failed, print the error
 	if err != nil {
 		fmt.Printf("Error: %s", err)
 		return
 	}
+	// If the secret is empty, print an error
+	if secret == "" {
+		fmt.Println("Error: Secret not found")
+		return
+	}
 
-	// If the --out flag is used write the secret to a file
+	// If the --out flag is used, write the secret to a file
 	if OutFilePath != "" {
 		err := os.WriteFile(OutFilePath, []byte(secret), 0644)
 		if err != nil {
