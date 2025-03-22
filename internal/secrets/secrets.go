@@ -1,4 +1,4 @@
-package secretref
+package secrets
 
 import (
 	"fmt"
@@ -7,7 +7,6 @@ import (
 )
 
 func GetVaultReference(secretRef string) (VaultType, string) {
-
 	switch GetRefType(secretRef) {
 	case SecretRefTypeAwsArn:
 		return VaultTypeAws, secretRef

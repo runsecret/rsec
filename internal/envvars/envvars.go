@@ -5,15 +5,15 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/devenjarvis/signet/internal/secretref"
+	"github.com/devenjarvis/signet/internal/secrets"
 	"github.com/devenjarvis/signet/pkg/aws"
 )
 
 func GetSecret(secretRef string) (secret string, err error) {
-	vaultType, vaultRef := secretref.GetVaultReference(secretRef)
+	vaultType, vaultRef := secrets.GetVaultReference(secretRef)
 
 	switch vaultType {
-	case secretref.VaultTypeAws:
+	case secrets.VaultTypeAws:
 		secret, err = aws.GetSecret(vaultRef)
 	default:
 		// Do nothing
@@ -50,7 +50,6 @@ func SetSecrets(cmd *exec.Cmd, envFilePath string) (envVars []string, redactList
 			// Add secret to list of secrets for redaction
 			redactList = append(redactList, secret)
 		}
-
 	}
 
 	return

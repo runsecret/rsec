@@ -1,0 +1,47 @@
+linters:
+  enable:
+    - goimports
+    - revive
+    - tagliatelle
+    - misspell
+    - unconvert
+    - whitespace
+    - dupword
+    - gofumpt
+    - gocritic
+    - gocyclo
+    - testifylint
+linters-settings:
+  gocyclo:
+    # Minimal code complexity to report.
+    # Default: 30 (but we recommend 10-20)
+    # TODO: Bump this back down to 15 when we are ready
+    min-complexity: 25 
+  tagliatelle:
+    case:
+      rules:
+        dynamodbav: camel
+        json: camel
+  revive:
+    ignore-generated-header: true
+    severity: warning
+    confidence: 0.8
+    rules:
+      - name: blank-imports
+      - name: context-as-argument
+      - name: context-keys-type
+      - name: dot-imports
+      - name: error-return
+      - name: error-strings
+      - name: error-naming
+      - name: if-return
+      - name: increment-decrement
+      - name: var-naming
+      - name: var-declaration
+      - name: range
+      - name: exported
+      - name: package-comments
+      - name: receiver-naming
+      - name: time-naming
+      - name: indent-error-flow
+      - name: errorf

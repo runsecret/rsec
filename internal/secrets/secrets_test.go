@@ -1,4 +1,4 @@
-package secretref
+package secrets
 
 import (
 	"reflect"

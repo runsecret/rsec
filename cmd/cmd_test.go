@@ -5,11 +5,11 @@ import (
 	"io"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestGetCommand(t *testing.T) {
-	assert := assert.New(t)
+	require := require.New(t)
 	cmd := NewGetCmd()
 
 	// Capture output
@@ -17,7 +17,8 @@ func TestGetCommand(t *testing.T) {
 	cmd.SetOut(b)
 
 	// Execute the command
-	cmd.Execute()
-	_, err := io.ReadAll(b)
-	assert.Equal(err, nil)
+	err := cmd.Execute()
+	require.Error(err)
+	_, err = io.ReadAll(b)
+	require.NoError(err)
 }

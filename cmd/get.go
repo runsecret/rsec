@@ -33,7 +33,7 @@ signet get my-secret --out secret.txt`,
 
 			// If the --out flag is used, write the secret to a file
 			if OutFilePath != "" {
-				err := os.WriteFile(OutFilePath, []byte(secret), 0644)
+				err := os.WriteFile(OutFilePath, []byte(secret), 0o644)
 				if err != nil {
 					return err
 				}
