@@ -1,4 +1,4 @@
-package envfile
+package envvars
 
 import (
 	"os"
@@ -7,7 +7,7 @@ import (
 
 var ErrInvalidEnvFile = os.ErrInvalid
 
-func validate(envVars []string) (err error) {
+func validateEnvFile(envVars []string) (err error) {
 	// Valiate the env file is in the correct format
 	for _, envVar := range envVars {
 		parts := strings.SplitN(envVar, "=", 2)
@@ -31,14 +31,14 @@ func validate(envVars []string) (err error) {
 	return
 }
 
-func Read(path string) (envVars []string, err error) {
+func readEnvFile(path string) (envVars []string, err error) {
 	envs, err := os.ReadFile(path)
 	if err != nil {
 		return
 	}
 	envVars = strings.Split(string(envs), "\n")
 
-	err = validate(envVars)
+	err = validateEnvFile(envVars)
 	if err != nil {
 		envVars = []string{}
 		return

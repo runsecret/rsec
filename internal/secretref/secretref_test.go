@@ -6,7 +6,7 @@ import (
 )
 
 // Test ParseRefType
-func TestParseRefType(t *testing.T) {
+func TestGetRefType(t *testing.T) {
 	// Test cases
 	tests := []struct {
 		name string
@@ -33,7 +33,7 @@ func TestParseRefType(t *testing.T) {
 	// Run tests
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := ParseRefType(tt.str)
+			got := GetRefType(tt.str)
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("ParseVaultType() = %v, want %v", got, tt.want)
 			}

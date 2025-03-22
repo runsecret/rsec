@@ -7,7 +7,6 @@ import (
 	"os/exec"
 
 	"github.com/creack/pty"
-	"github.com/devenjarvis/signet/internal/redact"
 )
 
 func Run(userCmd *exec.Cmd, secrets []string) ([]byte, error) {
@@ -32,5 +31,5 @@ func Run(userCmd *exec.Cmd, secrets []string) ([]byte, error) {
 
 	// Redact secrets while preserving formatting
 	rawOutput := buf.Bytes()
-	return redact.Secrets(rawOutput, secrets), nil
+	return redactSecrets(rawOutput, secrets), nil
 }

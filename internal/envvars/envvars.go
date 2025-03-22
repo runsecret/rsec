@@ -2,10 +2,11 @@ package envvars
 
 import (
 	"fmt"
+	"os/exec"
 	"strings"
 
-	"github.com/devenjarvis/signet/internal/aws"
 	"github.com/devenjarvis/signet/internal/secretref"
+	"github.com/devenjarvis/signet/pkg/aws"
 )
 
 func GetSecret(secretRef string) (secret string, err error) {
@@ -21,8 +22,14 @@ func GetSecret(secretRef string) (secret string, err error) {
 	return
 }
 
-func SetSecrets(rawEnv []string) (envVars []string, redactList []string, err error) {
-	envVars = rawEnv
+func SetSecrets(cmd *exec.Cmd, envFilePath string) (envVars []string, redactList []string, err error) {
+	// load ENV VARs
+	envVars, err = loadEnvVars(cmd, envFilePath)
+	if err != nil {
+		return
+	}
+
+	// Replace secret references in ENV VARS
 	for i, envVar := range envVars {
 		// Split env vars
 		parts := strings.SplitN(envVar, "=", 2)
@@ -47,4 +54,20 @@ func SetSecrets(rawEnv []string) (envVars []string, redactList []string, err err
 	}
 
 	return
+}
+
+func loadEnvVars(cmd *exec.Cmd, envFilePath string) ([]string, error) {
+	// Load system env vars
+	cmdEnviron := cmd.Environ()
+
+	// If --env flag used, load env vars from file
+	if envFilePath != "" {
+		fileEnviron, err := readEnvFile(envFilePath)
+		if err != nil {
+			return cmdEnviron, err
+		}
+		cmdEnviron = append(cmdEnviron, fileEnviron...)
+	}
+
+	return cmdEnviron, nil
 }

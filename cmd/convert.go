@@ -25,7 +25,7 @@ to quickly create a Cobra application.`,
 		secretRef := args[0]
 
 		var convertedRef string
-		switch secretref.ParseRefType(secretRef) {
+		switch secretref.GetRefType(secretRef) {
 		case secretref.SecretRefTypeAwsArn:
 			convertedRef = secretref.ConvertAwsArnToAwsRef(secretRef)
 		case secretref.SecretRefTypeAwsRef:

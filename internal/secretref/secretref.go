@@ -8,7 +8,7 @@ import (
 
 func GetVaultReference(secretRef string) (VaultType, string) {
 
-	switch ParseRefType(secretRef) {
+	switch GetRefType(secretRef) {
 	case SecretRefTypeAwsArn:
 		return VaultTypeAws, secretRef
 	case SecretRefTypeAwsRef:
@@ -18,7 +18,7 @@ func GetVaultReference(secretRef string) (VaultType, string) {
 	}
 }
 
-func ParseRefType(secretRef string) SecretRefType {
+func GetRefType(secretRef string) SecretRefType {
 	awsArnRegex := regexp.MustCompile(`arn:aws.*`)                      // Ex: arn:aws:secretsmanager:us-west-2:123456789012:secret:my-secret
 	awsRefRegex := regexp.MustCompile(`aws:\/\/[^\/]*\/[^\/]*\/[^\/]*`) // Ex: aws://us-west-2/123456789012/my-secret
 
