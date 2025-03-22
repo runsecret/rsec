@@ -17,13 +17,11 @@ var OutFilePath string
 var getCmd = &cobra.Command{
 	Use:   "get",
 	Args:  cobra.MatchAll(cobra.ExactArgs(1), cobra.OnlyValidArgs),
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Get the secret value from a reference",
+	Long: `Get the secret value from a reference.
+If the --out flag is used, the secret will be written to the specified file.`,
+	Example: `  signet get my-secret
+  signet get my-secret --out secret.txt`,
 	Run: getFunc,
 }
 
