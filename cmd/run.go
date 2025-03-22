@@ -14,6 +14,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var EnvFilePath string
+
 // runCmd represents the run command
 var runCmd = &cobra.Command{
 	Use:   "run",
@@ -31,8 +33,21 @@ func run(cmd *cobra.Command, args []string) {
 	// Build Command
 	userCmd := exec.Command(args[0], args[1:]...)
 
+	// Load system env vars
+	cmdEnviron := userCmd.Environ()
+
+	// If --env flag used, load env vars from file
+	if EnvFilePath != "" {
+		fileEnviron, err := core.ReadEnvFile(EnvFilePath)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		cmdEnviron = append(cmdEnviron, fileEnviron...)
+	}
+
 	// Replace secrets in env vars
-	env, secrets, err := core.ReplaceEnvVarSecrets(userCmd.Environ())
+	env, secrets, err := core.ReplaceEnvVarSecrets(cmdEnviron)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -71,4 +86,6 @@ func run(cmd *cobra.Command, args []string) {
 
 func init() {
 	rootCmd.AddCommand(runCmd)
+
+	runCmd.Flags().StringVarP(&EnvFilePath, "env", "e", "", "Env file to read env vars from")
 }
