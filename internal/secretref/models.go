@@ -8,3 +8,11 @@ const (
 	VaultTypeAzure                    // Azure - TODO: Implement
 	VaultTypeUnknown                  // Unknown
 )
+
+type SecretRefType int
+
+const (
+	SecretRefTypeAwsArn  SecretRefType = iota // AWS ARN
+	SecretRefTypeAwsRef                       // AWS Ref
+	SecretRefTypeUnknown                      // Unknown
+)
