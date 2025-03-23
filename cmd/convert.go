@@ -6,7 +6,7 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/devenjarvis/signet/internal/secrets"
+	"github.com/runsecret/rsec/internal/secrets"
 	"github.com/spf13/cobra"
 )
 

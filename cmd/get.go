@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/devenjarvis/signet/internal/envvars"
+	"github.com/runsecret/rsec/internal/envvars"
 	"github.com/spf13/cobra"
 )
 
@@ -20,8 +20,8 @@ func NewGetCmd() *cobra.Command {
 		Short: "Get the secret value from a reference",
 		Long: `Get the secret value from a reference.
 If the --out flag is used, the secret will be written to the specified file.`,
-		Example: `  signet get my-secret
-signet get my-secret --out secret.txt`,
+		Example: `  rsec get my-secret
+rsec get my-secret --out secret.txt`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			secretRef := args[0]
 

@@ -5,8 +5,8 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/devenjarvis/signet/internal/secrets"
-	"github.com/devenjarvis/signet/pkg/aws"
+	"github.com/runsecret/rsec/internal/secrets"
+	"github.com/runsecret/rsec/pkg/aws"
 )
 
 func GetSecret(secretRef string) (secret string, err error) {

@@ -11,11 +11,11 @@ import (
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "signet",
+	Use:   "rsec",
 	Short: "The safe and easy way to use secrets on your local machine",
-	Long: `Signet is a CLI tool that helps you use secrets safely on your local machine. 
-Set environment variables with secret references and Signet will replace them with the actual secret values at run time.
-Signet also redacts secrets from the output of commands, minimizing the possible exposure of sensitive information.`,
+	Long: `rsec is a CLI tool that helps you use secrets safely on your local machine. 
+Set environment variables with secret references and rsec will replace them with the actual secret values at run time.
+rsec also redacts secrets from the output of commands, minimizing the possible exposure of sensitive information.`,
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.

@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"os/exec"
 
-	"github.com/devenjarvis/signet/internal/command"
-	"github.com/devenjarvis/signet/internal/envvars"
+	"github.com/runsecret/rsec/internal/command"
+	"github.com/runsecret/rsec/internal/envvars"
 	"github.com/spf13/cobra"
 )
 
@@ -20,8 +20,8 @@ var runCmd = &cobra.Command{
 	Short: "Run a command with secrets",
 	Long: `Run a command with secrets.
 If the --env flag is used, the command will be run with the environment variables loaded from the specified file.`,
-	Example: `signet run -- echo
-signet run --env .env -- echo`,
+	Example: `rsec run -- echo
+rsec run --env .env -- echo`,
 	Run: runFunc,
 }
 

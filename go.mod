@@ -1,4 +1,4 @@
-module github.com/devenjarvis/signet
+module github.com/runsecret/rsec
 
 go 1.22.5
 
