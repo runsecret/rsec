@@ -1,2 +1,2 @@
-# rsec
+# RunSecret CLI (rsec)
 
