@@ -17,11 +17,12 @@ var EnvFilePath string
 // runCmd represents the run command
 var runCmd = &cobra.Command{
 	Use:   "run",
+	Args:  cobra.MatchAll(cobra.MinimumNArgs(1), cobra.OnlyValidArgs),
 	Short: "Run a command with secrets",
 	Long: `Run a command with secrets.
 If the --env flag is used, the command will be run with the environment variables loaded from the specified file.`,
-	Example: `rsec run -- echo
-rsec run --env .env -- echo`,
+	Example: `  rsec run -- echo
+  rsec run --env .env -- echo`,
 	Run: runFunc,
 }
 

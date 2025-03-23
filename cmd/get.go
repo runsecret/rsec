@@ -21,7 +21,7 @@ func NewGetCmd() *cobra.Command {
 		Long: `Get the secret value from a reference.
 If the --out flag is used, the secret will be written to the specified file.`,
 		Example: `  rsec get my-secret
-rsec get my-secret --out secret.txt`,
+  rsec get my-secret --out secret.txt`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			secretRef := args[0]
 
