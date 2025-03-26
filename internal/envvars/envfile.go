@@ -2,6 +2,7 @@ package envvars
 
 import (
 	"os"
+	"slices"
 	"strings"
 )
 
@@ -36,7 +37,18 @@ func readEnvFile(path string) (envVars []string, err error) {
 	if err != nil {
 		return
 	}
+	// Split the env file into individual lines
 	envVars = strings.Split(string(envs), "\n")
+
+	// Remove any empty lines or comments
+	for i := 0; i < len(envVars); {
+		envVar := envVars[i]
+		if strings.TrimSpace(envVar) == "" || strings.HasPrefix(envVar, "#") {
+			envVars = slices.Delete(envVars, i, i+1)
+		} else {
+			i++
+		}
+	}
 
 	err = validateEnvFile(envVars)
 	if err != nil {
