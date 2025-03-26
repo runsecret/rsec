@@ -8,17 +8,20 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestGetCommand(t *testing.T) {
+func TestCopyCommand_MissingArgument(t *testing.T) {
 	require := require.New(t)
-	cmd := NewGetCmd()
+	cmd := NewCopyCmd()
 
 	// Capture output
 	b := bytes.NewBufferString("")
 	cmd.SetOut(b)
 
-	// Execute the command
+	// Execute command with no arguments
 	err := cmd.Execute()
+	// Expect an error
 	require.Error(err)
+
+	// Ensure output is as expected
 	_, err = io.ReadAll(b)
 	require.NoError(err)
 }
