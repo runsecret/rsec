@@ -6,8 +6,8 @@ func redactSecrets(input []byte, secretsToRedact []string) []byte {
 	result := string(input)
 
 	for _, secret := range secretsToRedact {
-		// Create a replacement string of * with the same length as the secret
-		replacement := strings.Repeat("*", len(secret))
+		// Create a replacement string of ***** to obfuscate the secret and secret length
+		replacement := "*****"
 
 		// Replace the secret with the asterisks
 		result = strings.ReplaceAll(result, secret, replacement)
