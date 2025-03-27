@@ -2,7 +2,7 @@ module github.com/runsecret/rsec
 
 go 1.23.0
 
-toolchain go1.23.7
+toolchain go1.24.1
 
 require (
 	github.com/aws/aws-sdk-go-v2 v1.36.3
@@ -55,7 +55,7 @@ require (
 	golang.org/x/exp/shiny v0.0.0-20250305212735-054e65f0b394 // indirect
 	golang.org/x/image v0.14.0 // indirect
 	golang.org/x/mobile v0.0.0-20231127183840-76ac6878050a // indirect
-	golang.org/x/net v0.33.0 // indirect
+	golang.org/x/net v0.36.0 // indirect
 	golang.org/x/sys v0.31.0 // indirect
 	golang.org/x/term v0.30.0 // indirect
 	golang.org/x/text v0.23.0 // indirect
