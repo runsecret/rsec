@@ -6,10 +6,8 @@ import (
 	"strings"
 )
 
-func GetVaultReference(secretRef string) (VaultType, string) {
+func GetVaultAddress(secretRef string) (VaultType, string) {
 	switch GetRefType(secretRef) {
-	case SecretRefTypeAwsArn:
-		return VaultTypeAws, secretRef
 	case SecretRefTypeAwsRef:
 		return VaultTypeAws, ConvertAwsRefToAwsArn(secretRef)
 	default:

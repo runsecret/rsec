@@ -10,11 +10,11 @@ import (
 )
 
 func GetSecret(secretRef string) (secret string, err error) {
-	vaultType, vaultRef := secrets.GetVaultReference(secretRef)
+	vaultType, vaultAddress := secrets.GetVaultAddress(secretRef)
 
 	switch vaultType {
 	case secrets.VaultTypeAws:
-		secret, err = aws.GetSecret(vaultRef)
+		secret, err = aws.GetSecret(vaultAddress)
 	default:
 		// Do nothing
 	}

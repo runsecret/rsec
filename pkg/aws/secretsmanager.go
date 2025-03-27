@@ -10,7 +10,7 @@ import (
 )
 
 // secretName example: arn:aws:secretsmanager:us-east-2:111122223333:secret:SecretName-abcdef
-func GetSecret(secretName string) (string, error) {
+func GetSecret(arn string) (string, error) {
 	// Point to localstack
 	awsEndpoint := "http://localhost:4566"
 	// awsRegion := "us-east-1"
@@ -27,7 +27,7 @@ func GetSecret(secretName string) (string, error) {
 
 	// Get the secret
 	input := &secretsmanager.GetSecretValueInput{
-		SecretId: aws.String(secretName),
+		SecretId: aws.String(arn),
 	}
 	result, err := client.GetSecretValue(context.TODO(), input)
 	if err != nil {

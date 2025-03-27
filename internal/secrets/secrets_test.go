@@ -42,7 +42,7 @@ func TestGetRefType(t *testing.T) {
 }
 
 // Test GetVaultReference
-func TestGetVaultReference(t *testing.T) {
+func TestGetVaultAddress(t *testing.T) {
 	// Test cases
 	tests := []struct {
 		name      string
@@ -53,8 +53,8 @@ func TestGetVaultReference(t *testing.T) {
 		{
 			name:      "AWS ARN",
 			str:       "arn:aws:secretsmanager:us-east-1:000000000000:secret:MyTestSecret",
-			wantVault: VaultTypeAws,
-			wantRef:   "arn:aws:secretsmanager:us-east-1:000000000000:secret:MyTestSecret",
+			wantVault: VaultTypeUnknown,
+			wantRef:   "Invalid secret reference",
 		},
 		{
 			name:      "AWS Ref",
@@ -73,7 +73,7 @@ func TestGetVaultReference(t *testing.T) {
 	// Run tests
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotType, gotRef := GetVaultReference(tt.str)
+			gotType, gotRef := GetVaultAddress(tt.str)
 			if !reflect.DeepEqual(gotType, tt.wantVault) {
 				t.Errorf("GetVaultReference() = %v, want %v", gotType, tt.wantVault)
 			}
