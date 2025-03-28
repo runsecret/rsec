@@ -17,7 +17,7 @@ func TestExecute(t *testing.T) {
 
 	// Then
 	require.NoError(t, err)
-	require.Equal(t, "command.go\tcommand_test.go\tredact.go\tredact_test.go\r\n", string(output))
+	require.Equal(t, "command.go\tcommand_test.go\r\n", string(output))
 }
 
 func TestRedactSecrets(t *testing.T) {
