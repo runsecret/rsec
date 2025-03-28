@@ -27,7 +27,10 @@ func NewCopyCmd() *cobra.Command {
 			}
 
 			// Write to clipboard using OSC 52
-			osc52.New(secret).WriteTo(os.Stderr)
+			_, err = osc52.New(secret).WriteTo(os.Stderr)
+			if err != nil {
+				return err
+			}
 
 			fmt.Println("✓ - Secret copied to clipboard!")
 			return nil
