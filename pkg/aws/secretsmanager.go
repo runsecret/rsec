@@ -9,8 +9,12 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/secretsmanager"
 )
 
+type AwsSecretsManagerClient struct {
+	client *secretsmanager.Client
+}
+
 // secretName example: arn:aws:secretsmanager:us-east-2:111122223333:secret:SecretName-abcdef
-func GetSecret(arn string) (string, error) {
+func (a AwsSecretsManagerClient) GetSecret(arn string) (string, error) {
 	// Point to localstack
 	awsEndpoint := "http://localhost:4566"
 	// awsRegion := "us-east-1"

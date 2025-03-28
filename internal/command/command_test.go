@@ -19,3 +19,15 @@ func TestRun(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, "command.go\tcommand_test.go\tredact.go\tredact_test.go\r\n", string(output))
 }
+
+func TestRedactSecrets(t *testing.T) {
+	// Given
+	input := []byte("This is a secret: my-secret")
+	secretsToRedact := []string{"my-secret"}
+
+	// When
+	result := redactSecrets(input, secretsToRedact)
+
+	// Then
+	require.Equal(t, "This is a secret: *****", string(result))
+}

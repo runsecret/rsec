@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os/exec"
+	"strings"
 
 	"github.com/creack/pty"
 )
@@ -32,4 +33,19 @@ func Run(userCmd *exec.Cmd, secrets []string) ([]byte, error) {
 	// Redact secrets while preserving formatting
 	rawOutput := buf.Bytes()
 	return redactSecrets(rawOutput, secrets), nil
+}
+
+
+func redactSecrets(input []byte, secretsToRedact []string) []byte {
+	result := string(input)
+
+	for _, secret := range secretsToRedact {
+		// Create a replacement string of ***** to obfuscate the secret and secret length
+		replacement := "*****"
+
+		// Replace the secret with the asterisks
+		result = strings.ReplaceAll(result, secret, replacement)
+	}
+
+	return []byte(result)
 }

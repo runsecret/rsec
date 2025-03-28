@@ -48,3 +48,11 @@ func ConvertAwsRefToAwsArn(ref string) string {
 	name := parts[4]
 	return fmt.Sprintf("arn:aws:secretsmanager:%s:%s:secret:%s", region, account, name)
 }
+
+type VaultConnection interface {
+	GetSecret(string) (string, error)
+}
+
+func GetSecret(vault VaultConnection, vaultAddress string) (string, error) {
+	return vault.GetSecret(vaultAddress)
+}
