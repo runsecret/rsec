@@ -1,14 +1,12 @@
-/*
-Copyright © 2025 NAME HERE <EMAIL ADDRESS>
-*/
 package cmd
 
 import (
 	"fmt"
+	"os"
 
+	"github.com/aymanbagabas/go-osc52/v2"
 	"github.com/runsecret/rsec/internal/envvars"
 	"github.com/spf13/cobra"
-	"golang.design/x/clipboard"
 )
 
 func NewCopyCmd() *cobra.Command {
@@ -22,19 +20,17 @@ func NewCopyCmd() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			secretRef := args[0]
 
-			// Initialize clipboard
-			err := clipboard.Init()
-			if err != nil {
-				panic(err)
-			}
-
 			// Get secret based on vault type
 			secret, err := envvars.GetSecret(secretRef)
 			if err != nil {
 				return err
 			}
 
-			clipboard.Write(clipboard.FmtText, []byte(secret))
+			// Write to clipboard using OSC 52
+			_, err = osc52.New(secret).WriteTo(os.Stderr)
+			if err != nil {
+				return err
+			}
 
 			fmt.Println("✓ - Secret copied to clipboard!")
 			return nil
