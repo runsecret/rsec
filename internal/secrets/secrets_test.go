@@ -3,6 +3,8 @@ package secrets
 import (
 	"reflect"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 // Test ParseRefType
@@ -41,7 +43,6 @@ func TestGetRefType(t *testing.T) {
 	}
 }
 
-// Test GetVaultReference
 func TestGetVaultAddress(t *testing.T) {
 	// Test cases
 	tests := []struct {
@@ -82,4 +83,20 @@ func TestGetVaultAddress(t *testing.T) {
 			}
 		})
 	}
+}
+
+// Test ConvertAwsArnToAwsRef
+func TestConvertAwsArnToAwsRef(t *testing.T) {
+	test_arn := "arn:aws:secretsmanager:us-east-1:000000000000:secret:MyTestSecret"
+	expected_ref := "aws://us-east-1/000000000000/MyTestSecret"
+	ref := ConvertAwsArnToAwsRef(test_arn)
+	assert.Equal(t, expected_ref, ref)
+}
+
+// Test ConvertAwsRefToAwsArn
+func TestConvertAwsRefToAwsArn(t *testing.T) {
+	test_ref := "aws://us-east-1/000000000000/MyTestSecret"
+	expected_arn := "arn:aws:secretsmanager:us-east-1:000000000000:secret:MyTestSecret"
+	arn := ConvertAwsRefToAwsArn(test_ref)
+	assert.Equal(t, expected_arn, arn)
 }
