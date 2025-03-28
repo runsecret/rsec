@@ -1,4 +1,4 @@
-package secretsmanager
+package aws
 
 import (
 	"context"
@@ -86,7 +86,6 @@ func ExampleSecretService_GetSecret() {
 
 	// Call the method
 	secret, err := service.GetSecret(context.Background(), secretID)
-
 	// Verify the results (in an actual test, you'd use testify/assert or standard testing assertions)
 	if err != nil {
 		fmt.Println("Error:", err)

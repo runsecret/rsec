@@ -87,16 +87,16 @@ func TestGetVaultAddress(t *testing.T) {
 
 // Test ConvertAwsArnToAwsRef
 func TestConvertAwsArnToAwsRef(t *testing.T) {
-	test_arn := "arn:aws:secretsmanager:us-east-1:000000000000:secret:MyTestSecret"
-	expected_ref := "aws://us-east-1/000000000000/MyTestSecret"
-	ref := ConvertAwsArnToAwsRef(test_arn)
-	assert.Equal(t, expected_ref, ref)
+	testArn := "arn:aws:secretsmanager:us-east-1:000000000000:secret:MyTestSecret"
+	expectedRef := "aws://us-east-1/000000000000/MyTestSecret"
+	ref := ConvertAwsArnToAwsRef(testArn)
+	assert.Equal(t, expectedRef, ref)
 }
 
 // Test ConvertAwsRefToAwsArn
 func TestConvertAwsRefToAwsArn(t *testing.T) {
-	test_ref := "aws://us-east-1/000000000000/MyTestSecret"
-	expected_arn := "arn:aws:secretsmanager:us-east-1:000000000000:secret:MyTestSecret"
-	arn := ConvertAwsRefToAwsArn(test_ref)
-	assert.Equal(t, expected_arn, arn)
+	testRef := "aws://us-east-1/000000000000/MyTestSecret"
+	expectedArn := "arn:aws:secretsmanager:us-east-1:000000000000:secret:MyTestSecret"
+	arn := ConvertAwsRefToAwsArn(testRef)
+	assert.Equal(t, expectedArn, arn)
 }

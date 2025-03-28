@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/aymanbagabas/go-osc52/v2"
-	"github.com/runsecret/rsec/internal/envvars"
+	"github.com/runsecret/rsec/internal/secrets"
 	"github.com/spf13/cobra"
 )
 
@@ -21,7 +21,7 @@ func NewCopyCmd() *cobra.Command {
 			secretRef := args[0]
 
 			// Get secret based on vault type
-			secret, err := envvars.GetSecret(secretRef)
+			secret, err := secrets.GetSecret(secretRef)
 			if err != nil {
 				return err
 			}

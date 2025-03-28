@@ -1,4 +1,4 @@
-package envvars
+package envfile
 
 import (
 	"os"
@@ -8,7 +8,7 @@ import (
 
 var ErrInvalidEnvFile = os.ErrInvalid
 
-func readEnvFile(path string) (envVars []string, err error) {
+func ReadEnvFile(path string) (envVars []string, err error) {
 	envs, err := os.ReadFile(path)
 	if err != nil {
 		return

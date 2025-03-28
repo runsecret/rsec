@@ -1,4 +1,4 @@
-package envvars
+package envfile
 
 import (
 	"reflect"
@@ -62,7 +62,7 @@ func TestReadEnvFile(t *testing.T) {
 	// Run tests
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := readEnvFile(tt.path)
+			got, err := ReadEnvFile(tt.path)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ReadEnvFile() error = %v, wantErr %v", err, tt.wantErr)
 				return

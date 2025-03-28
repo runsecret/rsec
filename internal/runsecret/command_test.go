@@ -1,4 +1,4 @@
-package command
+package runsecret
 
 import (
 	"os/exec"
@@ -7,13 +7,13 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestRun(t *testing.T) {
+func TestExecute(t *testing.T) {
 	// Given (ls formats output differently if it detects a TTY)
 	cmd := exec.Command("ls")
 	secrets := []string{}
 
 	// When
-	output, err := Run(cmd, secrets)
+	output, err := Execute(cmd, secrets)
 
 	// Then
 	require.NoError(t, err)
