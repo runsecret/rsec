@@ -7,35 +7,35 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// Test ParseRefType
-func TestGetRefType(t *testing.T) {
+// Test GetIdentifierType
+func TestGetIdentifierType(t *testing.T) {
 	// Test cases
 	tests := []struct {
 		name string
 		str  string
-		want SecretRefType
+		want SecretIdentifierType
 	}{
 		{
 			name: "AWS",
 			str:  "arn:aws:secretsmanager:us-east-1:000000000000:secret:MyTestSecret",
-			want: SecretRefTypeAwsArn,
+			want: SecretIdentifierTypeAwsArn,
 		},
 		{
 			name: "AWS",
 			str:  "aws://us-east-1/000000000000/MyTestSecret",
-			want: SecretRefTypeAwsRef,
+			want: SecretIdentifierTypeAwsRef,
 		},
 		{
 			name: "Unknown",
 			str:  "Any other string",
-			want: SecretRefTypeUnknown,
+			want: SecretIdentifierTypeUnknown,
 		},
 	}
 
 	// Run tests
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := GetRefType(tt.str)
+			got := GetIdentifierType(tt.str)
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("ParseVaultType() = %v, want %v", got, tt.want)
 			}

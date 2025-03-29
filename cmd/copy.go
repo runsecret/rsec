@@ -19,20 +19,25 @@ func NewCopyCmd() *cobra.Command {
   rsec get my-secret --out secret.txt`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			secretRef := args[0]
+			vaultClient := secrets.NewVaultClient()
 
-			// Get secret based on vault type
-			secret, err := secrets.GetSecret(secretRef)
+			// Retrieve secret if it exists
+			secret, err := vaultClient.CheckForSecret(secretRef)
 			if err != nil {
 				return err
 			}
 
 			// Write to clipboard using OSC 52
-			_, err = osc52.New(secret).WriteTo(os.Stderr)
-			if err != nil {
-				return err
-			}
+			if secret != "" {
+				_, err = osc52.New(secret).WriteTo(os.Stderr)
+				if err != nil {
+					return err
+				}
 
-			fmt.Println("✓ - Secret copied to clipboard!")
+				fmt.Println("✓ - Secret copied to clipboard!")
+				return nil
+			}
+			fmt.Println("X - No secret found! Double check the secret identifier provided?")
 			return nil
 		},
 	}

@@ -20,15 +20,15 @@ var refCmd = &cobra.Command{
 
 		var secretRef string
 		var vaultAddr string
-		switch secrets.GetRefType(refOrAddr) {
-		case secrets.SecretRefTypeAwsArn:
+		switch secrets.GetIdentifierType(refOrAddr) {
+		case secrets.SecretIdentifierTypeAwsArn:
 			vaultAddr = refOrAddr
 			secretRef = secrets.ConvertAwsArnToAwsRef(refOrAddr)
-		case secrets.SecretRefTypeAwsRef:
+		case secrets.SecretIdentifierTypeAwsRef:
 			vaultAddr = secrets.ConvertAwsRefToAwsArn(refOrAddr)
 			secretRef = refOrAddr
 		default:
-			secretRef = "Invalid secret address"
+			secretRef = "Invalid secret identifier"
 		}
 
 		fmt.Println("Secret Reference: ", secretRef)

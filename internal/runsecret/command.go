@@ -73,6 +73,8 @@ func setSecrets(cmd *exec.Cmd, envFilePath string) (envVars []string, redactList
 	}
 
 	// Replace secret references in ENV VARS
+	vaultClient := secrets.NewVaultClient()
+
 	for i, envVar := range envVars {
 		// Split env vars
 		parts := strings.SplitN(envVar, "=", 2)
@@ -81,7 +83,7 @@ func setSecrets(cmd *exec.Cmd, envFilePath string) (envVars []string, redactList
 
 		// Try to get secret from env var
 		var secret string
-		secret, err = secrets.GetSecret(value)
+		secret, err = vaultClient.CheckForSecret(value)
 		if err != nil {
 			return
 		}

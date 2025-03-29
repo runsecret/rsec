@@ -6,38 +6,49 @@ import (
 	"github.com/runsecret/rsec/pkg/aws"
 )
 
+type VaultClient struct {
+	awsClient *aws.SecretsManager
+}
+
+func NewVaultClient() VaultClient {
+	return VaultClient{}
+}
+
+func (vc VaultClient) CheckForSecret(secretRef string) (secret string, err error) {
+	vaultType, vaultAddress := GetVaultAddress(secretRef)
+
+	switch vaultType {
+	case VaultTypeAws:
+		if vc.awsClient == nil {
+			vc.awsClient = aws.NewSecretsManager("")
+		}
+		secret, err = vc.awsClient.GetSecret(vaultAddress)
+	default:
+		// Do nothing
+	}
+
+	return
+}
+
 func GetVaultAddress(secretRef string) (VaultType, string) {
-	switch GetRefType(secretRef) {
-	case SecretRefTypeAwsRef:
+	switch GetIdentifierType(secretRef) {
+	case SecretIdentifierTypeAwsRef:
 		return VaultTypeAws, ConvertAwsRefToAwsArn(secretRef)
 	default:
 		return VaultTypeUnknown, "Invalid secret reference"
 	}
 }
 
-func GetRefType(secretRef string) SecretRefType {
+func GetIdentifierType(secretRef string) SecretIdentifierType {
 	awsArnRegex := regexp.MustCompile(`arn:aws.*`)                      // Ex: arn:aws:secretsmanager:us-west-2:123456789012:secret:my-secret
 	awsRefRegex := regexp.MustCompile(`aws:\/\/[^\/]*\/[^\/]*\/[^\/]*`) // Ex: aws://us-west-2/123456789012/my-secret
 
 	switch {
 	case awsArnRegex.MatchString(secretRef):
-		return SecretRefTypeAwsArn
+		return SecretIdentifierTypeAwsArn
 	case awsRefRegex.MatchString(secretRef):
-		return SecretRefTypeAwsRef
+		return SecretIdentifierTypeAwsRef
 	default:
-		return SecretRefTypeUnknown
+		return SecretIdentifierTypeUnknown
 	}
-}
-
-func GetSecret(secretRef string) (secret string, err error) {
-	vaultType, vaultAddress := GetVaultAddress(secretRef)
-
-	switch vaultType {
-	case VaultTypeAws:
-		secret, err = aws.GetSecret(vaultAddress)
-	default:
-		// Do nothing
-	}
-
-	return
 }

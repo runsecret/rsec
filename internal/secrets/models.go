@@ -9,10 +9,10 @@ const (
 	VaultTypeUnknown                  // Unknown
 )
 
-type SecretRefType int
+type SecretIdentifierType int
 
 const (
-	SecretRefTypeAwsArn  SecretRefType = iota // AWS ARN
-	SecretRefTypeAwsRef                       // AWS Ref
-	SecretRefTypeUnknown                      // Unknown
+	SecretIdentifierTypeAwsArn  SecretIdentifierType = iota // AWS ARN
+	SecretIdentifierTypeAwsRef                              // AWS Ref
+	SecretIdentifierTypeUnknown                             // Unknown
 )
