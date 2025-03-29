@@ -4,49 +4,40 @@ import (
 	"fmt"
 	"os/exec"
 
-	"github.com/runsecret/rsec/internal/command"
-	"github.com/runsecret/rsec/internal/envvars"
+	"github.com/runsecret/rsec/internal/runsecret"
 	"github.com/spf13/cobra"
 )
 
 var EnvFilePath string
 
-// runCmd represents the run command
-var runCmd = &cobra.Command{
-	Use:   "run",
-	Args:  cobra.MatchAll(cobra.MinimumNArgs(1), cobra.OnlyValidArgs),
-	Short: "Run a command with secrets",
-	Long: `Run a command with secrets.
+func NewRunCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "run",
+		Args:  cobra.MatchAll(cobra.MinimumNArgs(1), cobra.OnlyValidArgs),
+		Short: "Run a command with secrets",
+		Long: `Run a command with secrets.
 If the --env flag is used, the command will be run with the environment variables loaded from the specified file.`,
-	Example: `  rsec run -- echo
+		Example: `  rsec run -- echo
   rsec run --env .env -- echo`,
-	Run: runFunc,
-}
+		RunE: func(cmd *cobra.Command, args []string) error {
+			// Build Command
+			userCmd := exec.Command(args[0], args[1:]...)
 
-func runFunc(cmd *cobra.Command, args []string) {
-	// Build Command
-	userCmd := exec.Command(args[0], args[1:]...)
+			// Run the command with runsecret
+			redactedOutput, err := runsecret.Run(userCmd, EnvFilePath)
+			if err != nil {
+				return err
+			}
 
-	// Replace secrets in env vars
-	env, secrets, err := envvars.SetSecrets(userCmd, EnvFilePath)
-	if err != nil {
-		fmt.Println(err)
-		return
+			// Output the result
+			fmt.Print(string(redactedOutput))
+			return nil
+		},
 	}
-	userCmd.Env = env
-
-	// Run Command
-	redactedOutput, err := command.Run(userCmd, secrets)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	// Print the result
-	fmt.Print(string(redactedOutput))
 }
 
 func init() {
+	runCmd := NewRunCmd()
 	rootCmd.AddCommand(runCmd)
 
 	runCmd.Flags().StringVarP(&EnvFilePath, "env", "e", "", "Env file to read env vars from")

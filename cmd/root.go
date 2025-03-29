@@ -17,7 +17,6 @@ var rootCmd = &cobra.Command{
 Set environment variables with secret references and rsec will replace them with the actual secret values at run time.
 rsec also redacts secrets from the output of commands, minimizing the possible exposure of sensitive information.
 `,
-	Run: runFunc,
 }
 
 func RenderUsage(cmd *cobra.Command) error {
