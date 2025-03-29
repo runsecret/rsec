@@ -7,6 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/secretsmanager"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
 )
 
 // MockSecretsManagerClient is a mock implementation of the AWS Secrets Manager client interface
@@ -51,7 +52,7 @@ func TestSecretsManager_GetSecret(t *testing.T) {
 
 	// Call the method
 	secret, err := service.GetSecret(secretID)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, expectedSecret, secret)
 
 	// Verify that the expected method was called
@@ -74,7 +75,7 @@ func TestSecretsManager_GetSecret_Error(t *testing.T) {
 
 	// Call the method
 	secret, err := service.GetSecret(secretID)
-	assert.Error(t, err)
+	require.Error(t, err)
 	assert.Empty(t, secret)
 
 	// Verify that the expected method was called
