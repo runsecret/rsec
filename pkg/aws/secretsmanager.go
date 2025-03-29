@@ -9,9 +9,16 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/secretsmanager"
 )
 
+// Define the interface to match the AWS Secrets Manager client methods you're using
+type SecretsManagerAPI interface {
+	GetSecretValue(ctx context.Context, params *secretsmanager.GetSecretValueInput, optFns ...func(*secretsmanager.Options)) (*secretsmanager.GetSecretValueOutput, error)
+	CreateSecret(ctx context.Context, params *secretsmanager.CreateSecretInput, optFns ...func(*secretsmanager.Options)) (*secretsmanager.CreateSecretOutput, error)
+	UpdateSecret(ctx context.Context, params *secretsmanager.UpdateSecretInput, optFns ...func(*secretsmanager.Options)) (*secretsmanager.UpdateSecretOutput, error)
+}
+
 type SecretsManager struct {
 	awsEndpoint string
-	client      *secretsmanager.Client
+	client      SecretsManagerAPI
 }
 
 func NewSecretsManager(awsEndpoint string) *SecretsManager {
@@ -22,9 +29,9 @@ func NewSecretsManager(awsEndpoint string) *SecretsManager {
 	return &SecretsManager{awsEndpoint: awsEndpoint}
 }
 
-func (s *SecretsManager) getClient() *secretsmanager.Client {
+func (s *SecretsManager) getClient() SecretsManagerAPI {
 	// Create client if not already created
-	if s.client != nil {
+	if s.client == nil {
 		awsCfg, err := config.LoadDefaultConfig(context.TODO())
 		if err != nil {
 			log.Fatalf("Cannot load the AWS configs: %s", err)
@@ -50,7 +57,7 @@ func (s SecretsManager) GetSecret(arn string) (string, error) {
 	// Call the GetSecretValue API
 	result, err := s.getClient().GetSecretValue(context.TODO(), input)
 	if err != nil {
-		log.Fatalf("Cannot get the secret: %s", err)
+		return "", err
 	}
 
 	// Decrypt and return secret string or binary
