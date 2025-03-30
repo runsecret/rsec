@@ -19,19 +19,18 @@ func NewRunCmd() *cobra.Command {
 If the --env flag is used, the command will be run with the environment variables loaded from the specified file.`,
 		Example: `  rsec run -- echo
   rsec run --env .env -- echo`,
-		RunE: func(cmd *cobra.Command, args []string) error {
+		Run: func(cmd *cobra.Command, args []string) {
 			// Build Command
 			userCmd := exec.Command(args[0], args[1:]...)
 
 			// Run the command with runsecret
 			redactedOutput, err := runsecret.Run(userCmd, EnvFilePath)
 			if err != nil {
-				return err
+				fmt.Println("Error running command: ", err)
 			}
 
 			// Output the result
 			fmt.Print(string(redactedOutput))
-			return nil
 		},
 	}
 }
