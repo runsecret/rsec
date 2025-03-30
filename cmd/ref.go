@@ -1,8 +1,6 @@
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/runsecret/rsec/internal/secrets"
 	"github.com/spf13/cobra"
 )
@@ -16,6 +14,7 @@ func NewRefCmd() *cobra.Command {
 		Example: `  rsec ref arn:aws:secretsmanager:us-west-2:123456789012:secret:my-secret
   rsec ref aws://us-west-2/123456789012/my-secret`,
 		Run: func(cmd *cobra.Command, args []string) {
+			std := NewStd(cmd)
 			refOrAddr := args[0]
 
 			var secretRef string
@@ -31,8 +30,8 @@ func NewRefCmd() *cobra.Command {
 				secretRef = "Invalid secret identifier"
 			}
 
-			fmt.Println("Secret Reference: ", secretRef)
-			fmt.Println("Vault Address:\t  ", vaultAddr)
+			std.Out("Secret Reference: ", secretRef)
+			std.Out("Vault Address:\t  ", vaultAddr)
 		},
 	}
 }
