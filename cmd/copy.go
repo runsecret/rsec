@@ -18,25 +18,29 @@ func NewCopyCmd() *cobra.Command {
 		Example: `  rsec copy my-secret
   rsec get my-secret --out secret.txt`,
 		Run: func(cmd *cobra.Command, args []string) {
+			std := NewStd(cmd)
 			secretRef := args[0]
 			vaultClient := secrets.NewVaultClient()
 
 			// Retrieve secret if it exists
 			secret, err := vaultClient.CheckForSecret(secretRef)
+			// Error handling
 			if err != nil {
-				fmt.Println("X - Error retrieving secret: ", err)
+				std.Err("❌ - Error retrieving secret: ", err)
+				return
+			}
+			if secret == "" {
+				std.Err("X - No secret found! Double check the secret identifier provided?")
+				return
 			}
 
 			// Write to clipboard using OSC 52
-			if secret != "" {
-				_, err = osc52.New(secret).WriteTo(os.Stderr)
-				if err != nil {
-					fmt.Println("X - Error writing to clipboard: ", err)
-				}
-
-				fmt.Println("✓ - Secret copied to clipboard!")
+			_, err = osc52.New(secret).WriteTo(os.Stderr)
+			if err != nil {
+				fmt.Println("❌ - Error writing to clipboard: ", err)
 			}
-			fmt.Println("X - No secret found! Double check the secret identifier provided?")
+
+			std.Out("✓ - Secret copied to clipboard!")
 		},
 	}
 }

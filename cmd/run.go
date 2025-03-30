@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"os/exec"
 
 	"github.com/runsecret/rsec/internal/runsecret"
@@ -20,17 +19,18 @@ If the --env flag is used, the command will be run with the environment variable
 		Example: `  rsec run -- echo
   rsec run --env .env -- echo`,
 		Run: func(cmd *cobra.Command, args []string) {
+			std := NewStd(cmd)
 			// Build Command
 			userCmd := exec.Command(args[0], args[1:]...)
 
 			// Run the command with runsecret
 			redactedOutput, err := runsecret.Run(userCmd, EnvFilePath)
 			if err != nil {
-				fmt.Println("Error running command: ", err)
+				std.Err("Error running command: ", err)
 			}
 
 			// Output the result
-			fmt.Print(string(redactedOutput))
+			std.Out(string(redactedOutput))
 		},
 	}
 }
