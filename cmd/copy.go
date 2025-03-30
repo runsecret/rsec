@@ -24,24 +24,23 @@ func NewCopyCmd() *cobra.Command {
 
 			// Retrieve secret if it exists
 			secret, err := vaultClient.CheckForSecret(secretRef)
+			// Error handling
 			if err != nil {
 				std.Err("❌ - Error retrieving secret: ", err)
 				return
 			}
-
-			// Write to clipboard using OSC 52
-			if secret != "" {
-				_, err = osc52.New(secret).WriteTo(os.Stderr)
-				if err != nil {
-					fmt.Println("❌ - Error writing to clipboard: ", err)
-				}
-
-				std.Out("✓ - Secret copied to clipboard!")
-				return
-			} else {
+			if secret == "" {
 				std.Err("X - No secret found! Double check the secret identifier provided?")
 				return
 			}
+
+			// Write to clipboard using OSC 52
+			_, err = osc52.New(secret).WriteTo(os.Stderr)
+			if err != nil {
+				fmt.Println("❌ - Error writing to clipboard: ", err)
+			}
+
+			std.Out("✓ - Secret copied to clipboard!")
 		},
 	}
 }
