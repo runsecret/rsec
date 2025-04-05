@@ -24,6 +24,8 @@ func isContainerRunning(containerName string) bool {
 
 func TestMain(m *testing.M) {
 	// Set environment variables to point tests to localstack
+	os.Setenv("AWS_ACCESS_KEY_ID", "test")
+	os.Setenv("AWS_SECRET_ACCESS_KEY", "test")
 	os.Setenv("AWS_ENDPOINT_URL", "http://localhost:4566")
 
 	// Check if localstack container is running
@@ -39,6 +41,8 @@ func TestMain(m *testing.M) {
 	}
 
 	// Restore original environment variables
+	os.Unsetenv("AWS_ACCESS_KEY_ID")
+	os.Unsetenv("AWS_SECRET_ACCESS_KEY")
 	os.Unsetenv("AWS_ENDPOINT_URL")
 
 	// Exit with the test run's exit code
