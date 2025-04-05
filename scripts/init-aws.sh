@@ -47,6 +47,7 @@ create_secret() {
 }
 
 # Define test secrets
+create_secret "basicPassword" 'password1234'
 create_secret "test/database/credentials" '{"username":"testuser","password":"testpassword","host":"localhost","port":5432,"dbname":"testdb"}'
 create_secret "test/api/keys" '{"api_key":"sk-test-12345","api_secret":"abcdef123456"}'
 create_secret "test/oauth/client" '{"client_id":"test-client-id","client_secret":"test-client-secret"}'
