@@ -18,7 +18,7 @@ func ConvertAwsArnToAwsRef(arn string) string {
 func ConvertAwsRefToAwsArn(ref string) string {
 	// From: aws://us-west-2/123456789012/my-secret
 	// To: arn:aws:secretsmanager:us-west-2:123456789012:secret:my-secret
-	parts := strings.Split(ref, "/")
+	parts := strings.SplitN(ref, "/", 5)
 	region := parts[2]
 	account := parts[3]
 	name := parts[4]

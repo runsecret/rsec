@@ -21,12 +21,8 @@ type SecretsManager struct {
 	client      SecretsManagerAPI
 }
 
-func NewSecretsManager(awsEndpoint string) *SecretsManager {
-	// Default to "secretsmanager.us-east-1.amazonaws.com" if not provided
-	if awsEndpoint == "" {
-		awsEndpoint = "secretsmanager.us-east-1.amazonaws.com"
-	}
-	return &SecretsManager{awsEndpoint: awsEndpoint}
+func NewSecretsManager() *SecretsManager {
+	return &SecretsManager{}
 }
 
 func (s *SecretsManager) getClient() SecretsManagerAPI {
@@ -38,9 +34,7 @@ func (s *SecretsManager) getClient() SecretsManagerAPI {
 		}
 
 		// Create the client
-		client := secretsmanager.NewFromConfig(awsCfg, func(o *secretsmanager.Options) {
-			o.BaseEndpoint = aws.String(s.awsEndpoint)
-		})
+		client := secretsmanager.NewFromConfig(awsCfg, func(o *secretsmanager.Options) {})
 		s.client = client
 	}
 
