@@ -43,7 +43,9 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
       - name: Start integration test containers
-        run: docker-compose up -d --build
+        run: docker compose up -d --build
+      - name: Sleep for 30 seconds
+        run: sleep 30
       - name: Run Tests
         uses: magefile/mage-action@v3
         with:
