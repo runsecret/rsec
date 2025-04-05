@@ -20,7 +20,7 @@ func (vc VaultClient) CheckForSecret(secretRef string) (secret string, err error
 	switch vaultType {
 	case VaultTypeAws:
 		if vc.awsClient == nil {
-			vc.awsClient = aws.NewSecretsManager("")
+			vc.awsClient = aws.NewSecretsManager()
 		}
 		secret, err = vc.awsClient.GetSecret(vaultAddress)
 	default:
