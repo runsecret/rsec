@@ -81,3 +81,29 @@ func TestRunCommand(t *testing.T) {
 	// Clean up env vars
 	os.Unsetenv("PASSWORD")
 }
+
+func TestRefCommand(t *testing.T) {
+	require := require.New(t)
+	assert := assert.New(t)
+	cmd := NewRefCmd()
+
+	// Capture output
+	b := bytes.NewBufferString("")
+	cmd.SetOut(b)
+
+	// Set up command arguments
+	cmd.SetArgs([]string{"aws://us-east-1/000000000000/test/api/keys"})
+
+	// Execute command
+	err := cmd.Execute()
+	// Expect no error
+	require.NoError(err)
+
+	// Ensure output is as expected
+	out, err := io.ReadAll(b)
+	require.NoError(err)
+	assert.Equal(
+		"Secret Reference:  aws://us-east-1/000000000000/test/api/keys\nVault Address:\t   arn:aws:secretsmanager:us-east-1:000000000000:secret:test/api/keys\n",
+		string(out),
+	)
+}
