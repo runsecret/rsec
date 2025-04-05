@@ -29,7 +29,7 @@ func TestCopyCommand(t *testing.T) {
 	// Ensure output is as expected
 	out, err := io.ReadAll(b)
 	require.NoError(err)
-	assert.Equal(string(out), "✓ - Secret copied to clipboard!\n")
+	assert.Equal("✓ - Secret copied to clipboard!\n", string(out))
 }
 
 func TestCopyCommand_MissingArgument(t *testing.T) {
