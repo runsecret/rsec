@@ -45,7 +45,5 @@ jobs:
       - name: Start integration test containers
         run: docker compose up -d --build
       - name: Run Tests
-        uses: magefile/mage-action@v3
-        with:
-          version: latest
-          args: test
+        shell: 'script -q -e -a /dev/null -c "bash {0}"'
+        run: "mage test"
