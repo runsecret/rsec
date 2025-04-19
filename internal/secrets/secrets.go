@@ -4,10 +4,16 @@ import (
 	"regexp"
 
 	"github.com/runsecret/rsec/pkg/aws"
+	"github.com/runsecret/rsec/pkg/azure"
 )
 
+type vaultClient interface {
+	GetSecret(secretRef string) (string, error)
+}
+
 type VaultClient struct {
-	awsClient *aws.SecretsManager
+	awsClient   vaultClient
+	azureClient vaultClient
 }
 
 func NewVaultClient() VaultClient {
@@ -23,6 +29,10 @@ func (vc VaultClient) CheckForSecret(secretRef string) (secret string, err error
 			vc.awsClient = aws.NewSecretsManager()
 		}
 		secret, err = vc.awsClient.GetSecret(vaultAddress)
+	case VaultTypeAzure:
+		if vc.azureClient == nil {
+			vc.azureClient = azure.NewKeyVault()
+		}
 	default:
 		// Do nothing
 	}

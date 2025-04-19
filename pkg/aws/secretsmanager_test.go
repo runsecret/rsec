@@ -21,18 +21,6 @@ func (m *MockSecretsManagerClient) GetSecretValue(ctx context.Context, params *s
 	return args.Get(0).(*secretsmanager.GetSecretValueOutput), args.Error(1)
 }
 
-// CreateSecret mocks the CreateSecret method
-func (m *MockSecretsManagerClient) CreateSecret(ctx context.Context, params *secretsmanager.CreateSecretInput, optFns ...func(*secretsmanager.Options)) (*secretsmanager.CreateSecretOutput, error) {
-	args := m.Called(ctx, params, optFns)
-	return args.Get(0).(*secretsmanager.CreateSecretOutput), args.Error(1)
-}
-
-// UpdateSecret mocks the UpdateSecret method
-func (m *MockSecretsManagerClient) UpdateSecret(ctx context.Context, params *secretsmanager.UpdateSecretInput, optFns ...func(*secretsmanager.Options)) (*secretsmanager.UpdateSecretOutput, error) {
-	args := m.Called(ctx, params, optFns)
-	return args.Get(0).(*secretsmanager.UpdateSecretOutput), args.Error(1)
-}
-
 // Test the GetSecret method
 func TestSecretsManager_GetSecret(t *testing.T) {
 	// Create a new mock client
