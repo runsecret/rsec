@@ -17,17 +17,6 @@ func ConvertAwsArnToRef(arn string) string {
 	return secretRef.String()
 }
 
-func ConvertRefToAwsArn(refUrl string) (string, error) {
-	// From: rsec://123456789012.sm.aws/v1/my-secret?region=us-west-2
-	// To: arn:aws:secretsmanager:us-west-2:123456789012:secret:my-secret
-	secretRef, err := NewSecretReferenceFromURL(refUrl)
-	if err != nil {
-		return "", err
-	}
-
-	return secretRef.GetVaultAddress(), nil
-}
-
 func vaultTypeFromString(vaultType string) VaultType {
 	switch vaultType {
 	case "sm.aws":
