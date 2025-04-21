@@ -14,15 +14,18 @@ func NewVaultClient() VaultClient {
 	return VaultClient{}
 }
 
-func (vc VaultClient) CheckForSecret(secretRef string) (secret string, err error) {
-	vaultType, vaultAddress := GetVaultAddress(secretRef)
+func (vc VaultClient) CheckForSecret(secretUrl string) (secret string, err error) {
+	secretRef, err := NewSecretReferenceFromURL(secretUrl)
+	if err != nil {
+		return "", err
+	}
 
-	switch vaultType {
-	case VaultTypeAws:
+	switch secretRef.vaultType {
+	case VaultTypeAwsSecretsManager:
 		if vc.awsClient == nil {
 			vc.awsClient = aws.NewSecretsManager()
 		}
-		secret, err = vc.awsClient.GetSecret(vaultAddress)
+		secret, err = vc.awsClient.GetSecret(secretRef.GetVaultAddress())
 	default:
 		// Do nothing
 	}
@@ -30,24 +33,15 @@ func (vc VaultClient) CheckForSecret(secretRef string) (secret string, err error
 	return
 }
 
-func GetVaultAddress(secretRef string) (VaultType, string) {
-	switch GetIdentifierType(secretRef) {
-	case SecretIdentifierTypeAwsRef:
-		return VaultTypeAws, ConvertAwsRefToAwsArn(secretRef)
-	default:
-		return VaultTypeUnknown, "Invalid secret reference"
-	}
-}
-
-func GetIdentifierType(secretRef string) SecretIdentifierType {
-	awsArnRegex := regexp.MustCompile(`arn:aws.*`)                      // Ex: arn:aws:secretsmanager:us-west-2:123456789012:secret:my-secret
-	awsRefRegex := regexp.MustCompile(`aws:\/\/[^\/]*\/[^\/]*\/[^\/]*`) // Ex: aws://us-west-2/123456789012/my-secret
+func GetIdentifierType(secretID string) SecretIdentifierType {
+	awsArnRegex := regexp.MustCompile(`arn:aws.*`) // Ex: arn:aws:secretsmanager:us-west-2:123456789012:secret:my-secret
+	refRegex := regexp.MustCompile(`rsec://.*`)    // Ex: aws://us-west-2/123456789012/my-secret
 
 	switch {
-	case awsArnRegex.MatchString(secretRef):
+	case awsArnRegex.MatchString(secretID):
 		return SecretIdentifierTypeAwsArn
-	case awsRefRegex.MatchString(secretRef):
-		return SecretIdentifierTypeAwsRef
+	case refRegex.MatchString(secretID):
+		return SecretIdentifierTypeRef
 	default:
 		return SecretIdentifierTypeUnknown
 	}

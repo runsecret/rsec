@@ -22,9 +22,14 @@ func NewRefCmd() *cobra.Command {
 			switch secrets.GetIdentifierType(refOrAddr) {
 			case secrets.SecretIdentifierTypeAwsArn:
 				vaultAddr = refOrAddr
-				secretRef = secrets.ConvertAwsArnToAwsRef(refOrAddr)
-			case secrets.SecretIdentifierTypeAwsRef:
-				vaultAddr = secrets.ConvertAwsRefToAwsArn(refOrAddr)
+				secretRef = secrets.ConvertAwsArnToRef(refOrAddr)
+			case secrets.SecretIdentifierTypeRef:
+				secretReference, err := secrets.NewSecretReferenceFromURL(refOrAddr)
+				if err != nil {
+					std.Err("❌ - Cannot parse secret reference ", err)
+					return
+				}
+				vaultAddr = secretReference.GetVaultAddress()
 				secretRef = refOrAddr
 			default:
 				secretRef = "Invalid secret identifier"

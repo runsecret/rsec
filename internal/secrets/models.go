@@ -3,16 +3,16 @@ package secrets
 type VaultType int
 
 const (
-	VaultTypeAws     VaultType = iota // AWS
-	VaultTypeGcp                      // GCP - TODO: Implement
-	VaultTypeAzure                    // Azure - TODO: Implement
-	VaultTypeUnknown                  // Unknown
+	VaultTypeAwsSecretsManager VaultType = iota // AWS
+	VaultTypeGcpSecretsManager                  // GCP - TODO: Implement
+	VaultTypeAzureKeyVault                      // Azure - TODO: Implement
+	VaultTypeUnknown                            // Unknown
 )
 
 type SecretIdentifierType int
 
 const (
 	SecretIdentifierTypeAwsArn  SecretIdentifierType = iota // AWS ARN
-	SecretIdentifierTypeAwsRef                              // AWS Ref
+	SecretIdentifierTypeRef                                 // rsec Ref
 	SecretIdentifierTypeUnknown                             // Unknown
 )

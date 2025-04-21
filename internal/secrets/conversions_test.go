@@ -4,20 +4,22 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 // Test ConvertAwsArnToAwsRef
-func TestConvertAwsArnToAwsRef(t *testing.T) {
+func TestConvertAwsArnToRef(t *testing.T) {
 	testArn := "arn:aws:secretsmanager:us-east-1:000000000000:secret:MyTestSecret"
-	expectedRef := "aws://us-east-1/000000000000/MyTestSecret"
-	ref := ConvertAwsArnToAwsRef(testArn)
+	expectedRef := "rsec://000000000000.sm.aws/MyTestSecret?region=us-east-1"
+	ref := ConvertAwsArnToRef(testArn)
 	assert.Equal(t, expectedRef, ref)
 }
 
 // Test ConvertAwsRefToAwsArn
-func TestConvertAwsRefToAwsArn(t *testing.T) {
-	testRef := "aws://us-east-1/000000000000/MyTestSecret"
+func TestConvertRefToAwsArn(t *testing.T) {
+	testRef := "rsec://000000000000.sm.aws/MyTestSecret?region=us-east-1"
 	expectedArn := "arn:aws:secretsmanager:us-east-1:000000000000:secret:MyTestSecret"
-	arn := ConvertAwsRefToAwsArn(testRef)
+	arn, err := ConvertRefToAwsArn(testRef)
+	require.NoError(t, err)
 	assert.Equal(t, expectedArn, arn)
 }
