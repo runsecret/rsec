@@ -26,6 +26,12 @@ func NewRefCmd() *cobra.Command {
 			case secrets.SecretIdentifierTypeAwsRef:
 				vaultAddr = secrets.ConvertAwsRefToAwsArn(refOrAddr)
 				secretRef = refOrAddr
+			case secrets.SecretIdentifierTypeAzureArn:
+				vaultAddr = refOrAddr
+				secretRef = secrets.ConvertAzureArnToAzureRef(refOrAddr)
+			case secrets.SecretIdentifierTypeAzureRef:
+				vaultAddr = secrets.ConvertAzureRefToAzureArn(refOrAddr)
+				secretRef = refOrAddr
 			default:
 				secretRef = "Invalid secret identifier"
 			}

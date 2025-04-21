@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"os"
+	"net/url"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/Azure/azure-sdk-for-go/sdk/keyvault/azsecrets"
@@ -23,8 +23,22 @@ func NewKeyVault() KeyVault {
 	return KeyVault{}
 }
 
-func (k *KeyVault) getClient() KeyVaultClientAPI {
-	vaultURI := fmt.Sprintf("https://%s.vault.azure.net/", os.Getenv("KEY_VAULT_NAME"))
+func getBaseURL(fullURL string) (string, error) {
+	parsedURL, err := url.Parse(fullURL)
+	if err != nil {
+		return "", err
+	}
+
+	baseURL := fmt.Sprintf("%s://%s", parsedURL.Scheme, parsedURL.Host)
+	fmt.Printf("Base URL: %s\n", baseURL)
+	return baseURL, nil
+}
+
+func (k *KeyVault) getClient(vaultAddress string) KeyVaultClientAPI {
+	vaultURI, err := getBaseURL(vaultAddress)
+	if err != nil {
+		log.Fatalf("Cannot parse Azure Vault URL: %s", err)
+	}
 
 	// Create client if not already created
 	if k.client == nil {
@@ -46,10 +60,10 @@ func (k *KeyVault) getClient() KeyVaultClientAPI {
 }
 
 // Ex: https://myvaultname.vault.azure.net/secrets/mysecretname/version123
-func (k KeyVault) GetSecret(secretName string) (string, error) {
+func (k KeyVault) GetSecret(vaultAddress string) (string, error) {
 	// Call the GetSecretValue API
 	version := "" // An empty string version gets the latest version of the secret.
-	resp, err := k.getClient().GetSecret(context.TODO(), secretName, version, nil)
+	resp, err := k.getClient(vaultAddress).GetSecret(context.TODO(), vaultAddress, version, nil)
 	if err != nil {
 		return "", err
 	}

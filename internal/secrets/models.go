@@ -12,7 +12,9 @@ const (
 type SecretIdentifierType int
 
 const (
-	SecretIdentifierTypeAwsArn  SecretIdentifierType = iota // AWS ARN
-	SecretIdentifierTypeAwsRef                              // AWS Ref
-	SecretIdentifierTypeUnknown                             // Unknown
+	SecretIdentifierTypeAwsArn   SecretIdentifierType = iota // AWS ARN
+	SecretIdentifierTypeAwsRef                               // AWS Ref
+	SecretIdentifierTypeAzureArn                             // Azure ARN
+	SecretIdentifierTypeAzureRef                             // Azure Ref
+	SecretIdentifierTypeUnknown                              // Unknown
 )

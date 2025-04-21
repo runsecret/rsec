@@ -21,3 +21,19 @@ func TestConvertAwsRefToAwsArn(t *testing.T) {
 	arn := ConvertAwsRefToAwsArn(testRef)
 	assert.Equal(t, expectedArn, arn)
 }
+
+// Test ConvertAzureArnToAzureRef
+func TestConvertAzureArnToAzureRef(t *testing.T) {
+	testArn := "https://myvaultname.vault.azure.net/secrets/mysecretname/"
+	expectedRef := "azure://myvaultname/mysecretname"
+	ref := ConvertAzureArnToAzureRef(testArn)
+	assert.Equal(t, expectedRef, ref)
+}
+
+// Test ConvertAzureRefToAzureArn
+func TestConvertAzureRefToAzureArn(t *testing.T) {
+	testRef := "azure://myvaultname/mysecretname"
+	expectedArn := "https://myvaultname.vault.azure.net/secrets/mysecretname/"
+	arn := ConvertAzureRefToAzureArn(testRef)
+	assert.Equal(t, expectedArn, arn)
+}
