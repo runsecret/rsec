@@ -1,4 +1,4 @@
-package secret
+package secretref
 
 import (
 	"net/url"
@@ -27,7 +27,7 @@ func NewSecretReference(vaultName string, vaultType VaultType, secretName string
 	}
 }
 
-func NewSecretReferenceFromURL(secretRef string) (SecretReference, error) {
+func NewSecretReferenceFromString(secretRef string) (SecretReference, error) {
 	// Example: rsec://123456789012.sm.aws/v1/my-secret?region=us-west-2
 	parsedURL, err := url.Parse(secretRef)
 	if err != nil {

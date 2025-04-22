@@ -1,4 +1,4 @@
-package secret
+package secretref
 
 type VaultType int
 

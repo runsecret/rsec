@@ -6,7 +6,7 @@ import (
 
 	"github.com/aymanbagabas/go-osc52/v2"
 	"github.com/runsecret/rsec/internal/vault"
-	"github.com/runsecret/rsec/pkg/secret"
+	"github.com/runsecret/rsec/pkg/secretref"
 	"github.com/spf13/cobra"
 )
 
@@ -21,12 +21,12 @@ func NewCopyCmd() *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			std := NewStd(cmd)
 			secretRef := args[0]
-			if !secret.IsSecretReference(secretRef) {
+			if !secretref.IsSecretReference(secretRef) {
 				std.Err("❌ - Invalid secret reference provided!")
 				return
 			}
 
-			vaultClient := vault.NewVaultClient()
+			vaultClient := vault.NewClient()
 
 			// Retrieve secret if it exists
 			secret, err := vaultClient.CheckForSecret(secretRef)

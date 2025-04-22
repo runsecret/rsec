@@ -4,29 +4,29 @@ import (
 	"regexp"
 
 	"github.com/runsecret/rsec/pkg/aws"
-	"github.com/runsecret/rsec/pkg/secret"
+	"github.com/runsecret/rsec/pkg/secretref"
 )
 
-type VaultClient struct {
+type Client struct {
 	awsClient *aws.SecretsManager
 }
 
-func NewVaultClient() VaultClient {
-	return VaultClient{}
+func NewClient() Client {
+	return Client{}
 }
 
-func (vc VaultClient) CheckForSecret(secretUrl string) (secretValue string, err error) {
-	secretRef, err := secret.NewSecretReferenceFromURL(secretUrl)
+func (c Client) CheckForSecret(secretID string) (secretValue string, err error) {
+	secretRef, err := secretref.NewSecretReferenceFromString(secretID)
 	if err != nil {
 		return "", err
 	}
 
 	switch secretRef.VaultType {
-	case secret.VaultTypeAwsSecretsManager:
-		if vc.awsClient == nil {
-			vc.awsClient = aws.NewSecretsManager()
+	case secretref.VaultTypeAwsSecretsManager:
+		if c.awsClient == nil {
+			c.awsClient = aws.NewSecretsManager()
 		}
-		secretValue, err = vc.awsClient.GetSecret(secretRef.GetVaultAddress())
+		secretValue, err = c.awsClient.GetSecret(secretRef.GetVaultAddress())
 	default:
 		// Do nothing
 	}

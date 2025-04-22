@@ -3,7 +3,7 @@ package vault
 import (
 	"strings"
 
-	"github.com/runsecret/rsec/pkg/secret"
+	"github.com/runsecret/rsec/pkg/secretref"
 )
 
 func ConvertAwsArnToRef(arn string) string {
@@ -13,7 +13,7 @@ func ConvertAwsArnToRef(arn string) string {
 	region := parts[3]
 	account := parts[4]
 	secretName := parts[6]
-	secretRef := secret.NewSecretReference(account, secret.VaultTypeAwsSecretsManager, secretName)
+	secretRef := secretref.NewSecretReference(account, secretref.VaultTypeAwsSecretsManager, secretName)
 	secretRef.SetRegion(region)
 
 	return secretRef.String()

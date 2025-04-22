@@ -10,7 +10,7 @@ import (
 	"github.com/creack/pty"
 	"github.com/runsecret/rsec/internal/vault"
 	"github.com/runsecret/rsec/pkg/envfile"
-	"github.com/runsecret/rsec/pkg/secret"
+	"github.com/runsecret/rsec/pkg/secretref"
 )
 
 func Run(userCmd *exec.Cmd, envFilePath string) ([]byte, error) {
@@ -74,7 +74,7 @@ func setSecrets(cmd *exec.Cmd, envFilePath string) (envVars []string, redactList
 	}
 
 	// Replace secret references in ENV VARS
-	vaultClient := vault.NewVaultClient()
+	vaultClient := vault.NewClient()
 
 	for i, envVar := range envVars {
 		// Split env vars
@@ -84,7 +84,7 @@ func setSecrets(cmd *exec.Cmd, envFilePath string) (envVars []string, redactList
 
 		// Try to get secret from env var
 		var secretValue string
-		if secret.IsSecretReference(value) {
+		if secretref.IsSecretReference(value) {
 			secretValue, err = vaultClient.CheckForSecret(value)
 			if err != nil {
 				return

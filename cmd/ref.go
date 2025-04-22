@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"github.com/runsecret/rsec/internal/vault"
-	"github.com/runsecret/rsec/pkg/secret"
+	"github.com/runsecret/rsec/pkg/secretref"
 	"github.com/spf13/cobra"
 )
 
@@ -25,7 +25,7 @@ func NewRefCmd() *cobra.Command {
 				vaultAddr = refOrAddr
 				secretRef = vault.ConvertAwsArnToRef(refOrAddr)
 			case vault.SecretIdentifierTypeRef:
-				secretReference, err := secret.NewSecretReferenceFromURL(refOrAddr)
+				secretReference, err := secretref.NewSecretReferenceFromString(refOrAddr)
 				if err != nil {
 					std.Err("❌ - Cannot parse secret reference ", err)
 					return
