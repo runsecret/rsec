@@ -65,7 +65,7 @@ func TestRunCommand(t *testing.T) {
 	cmd.SetArgs([]string{"--", "echo", "password1234"})
 
 	// Set up env vars
-	os.Setenv("PASSWORD", "aws://us-east-1/000000000000/basicPassword")
+	os.Setenv("PASSWORD", "rsec://000000000000.sm.aws/basicPassword?region=us-east-1")
 
 	// Execute command
 	err := cmd.Execute()

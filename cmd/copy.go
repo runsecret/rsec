@@ -20,6 +20,11 @@ func NewCopyCmd() *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			std := NewStd(cmd)
 			secretRef := args[0]
+			if !secrets.IsSecretReference(secretRef) {
+				std.Err("❌ - Invalid secret reference provided!")
+				return
+			}
+
 			vaultClient := secrets.NewVaultClient()
 
 			// Retrieve secret if it exists

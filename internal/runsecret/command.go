@@ -83,17 +83,20 @@ func setSecrets(cmd *exec.Cmd, envFilePath string) (envVars []string, redactList
 
 		// Try to get secret from env var
 		var secret string
-		secret, err = vaultClient.CheckForSecret(value)
-		if err != nil {
-			return
-		}
+		if secrets.IsSecretReference(value) {
+			secret, err = vaultClient.CheckForSecret(value)
+			if err != nil {
+				return
+			}
 
-		// If secret was found, replace it in the env var
-		if secret != "" {
-			// Replace the secret in the env var
-			envVars[i] = fmt.Sprintf("%s=%s", key, secret)
-			// Add secret to list of secrets for redaction
-			redactList = append(redactList, secret)
+			// Only replace secret if it is not empty
+			if secret != "" {
+				// Replace the secret in the env var
+				envVars[i] = fmt.Sprintf("%s=%s", key, secret)
+				// Add secret to list of secrets for redaction
+				redactList = append(redactList, secret)
+			}
+
 		}
 	}
 

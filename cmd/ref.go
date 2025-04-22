@@ -12,7 +12,7 @@ func NewRefCmd() *cobra.Command {
 		Short: "Get the secret reference and vault address from a provided secret",
 		Long:  `Get the secret reference and vault address from a provided secret`,
 		Example: `  rsec ref arn:aws:secretsmanager:us-west-2:123456789012:secret:my-secret
-  rsec ref aws://us-west-2/123456789012/my-secret`,
+  rsec ref rsec://123456789012.sm.aws/my-secret?region=us-west-2`,
 		Run: func(cmd *cobra.Command, args []string) {
 			std := NewStd(cmd)
 			refOrAddr := args[0]

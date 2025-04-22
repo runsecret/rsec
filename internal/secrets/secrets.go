@@ -33,9 +33,14 @@ func (vc VaultClient) CheckForSecret(secretUrl string) (secret string, err error
 	return
 }
 
+func IsSecretReference(potentialSecret string) bool {
+	refRegex := regexp.MustCompile(`(rsec:\/\/)([-a-zA-Z0-9_\+~#=]*)\.([a-z]*)\.([a-z]*)\/([-a-zA-Z0-9()@:%_\+.~#?&\/\/=]*)`)
+	return refRegex.MatchString(potentialSecret)
+}
+
 func GetIdentifierType(secretID string) SecretIdentifierType {
-	awsArnRegex := regexp.MustCompile(`arn:aws.*`) // Ex: arn:aws:secretsmanager:us-west-2:123456789012:secret:my-secret
-	refRegex := regexp.MustCompile(`rsec://.*`)    // Ex: aws://us-west-2/123456789012/my-secret
+	awsArnRegex := regexp.MustCompile(`arn:aws.*`)                                                                   // Ex: arn:aws:secretsmanager:us-west-2:123456789012:secret:my-secret
+	refRegex := regexp.MustCompile(`(rsec:\/\/)([-a-zA-Z0-9_\+~#=]*)\.([a-z.]*)\/([-a-zA-Z0-9()@:%_\+.~#?&\/\/=]*)`) // Ex: rsec://123456789012.aws/my-secret?region=us-west-2
 
 	switch {
 	case awsArnRegex.MatchString(secretID):
