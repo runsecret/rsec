@@ -25,11 +25,10 @@ func NewCopyCmd() *cobra.Command {
 				std.Err("❌ - Invalid secret reference provided!")
 				return
 			}
-
 			vaultClient := vault.NewClient()
 
 			// Retrieve secret if it exists
-			secret, err := vaultClient.CheckForSecret(secretRef)
+			secret, err := vaultClient.GetSecret(secretRef)
 			// Error handling
 			if err != nil {
 				std.Err("❌ - Error retrieving secret: ", err)

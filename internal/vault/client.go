@@ -15,7 +15,7 @@ func NewClient() Client {
 	return Client{}
 }
 
-func (c Client) CheckForSecret(secretID string) (secretValue string, err error) {
+func (c Client) GetSecret(secretID string) (secret string, err error) {
 	secretRef, err := secretref.NewFromString(secretID)
 	if err != nil {
 		return "", err
@@ -26,9 +26,10 @@ func (c Client) CheckForSecret(secretID string) (secretValue string, err error) 
 		if c.awsClient == nil {
 			c.awsClient = aws.NewSecretsManager()
 		}
-		secretValue, err = c.awsClient.GetSecret(secretRef.GetVaultAddress())
+		secret, err = c.awsClient.GetSecret(secretRef.GetVaultAddress())
 	default:
-		// Do nothing
+		// TODO: Return error if the vault type is not supported
+
 	}
 
 	return
