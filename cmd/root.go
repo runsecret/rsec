@@ -1,10 +1,8 @@
 package cmd
 
 import (
-	"fmt"
 	"os"
 
-	"github.com/runsecret/rsec/internal/tui"
 	"github.com/spf13/cobra"
 )
 
@@ -17,15 +15,6 @@ var rootCmd = &cobra.Command{
 Set environment variables with secret references and rsec will replace them with the actual secret values at run time.
 rsec also redacts secrets from the output of commands, minimizing the possible exposure of sensitive information.
 `,
-}
-
-func RenderUsage(cmd *cobra.Command) error {
-	fmt.Println(tui.RenderMkDown(cmd.Use))
-	return nil
-}
-
-func RenderHelp(cmd *cobra.Command, smthing []string) {
-	fmt.Println(tui.RenderMkDown(cmd.Long))
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
