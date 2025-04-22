@@ -1,9 +1,10 @@
-package secrets
+package vault
 
 import (
 	"regexp"
 
 	"github.com/runsecret/rsec/pkg/aws"
+	"github.com/runsecret/rsec/pkg/secret"
 )
 
 type VaultClient struct {
@@ -14,28 +15,23 @@ func NewVaultClient() VaultClient {
 	return VaultClient{}
 }
 
-func (vc VaultClient) CheckForSecret(secretUrl string) (secret string, err error) {
-	secretRef, err := NewSecretReferenceFromURL(secretUrl)
+func (vc VaultClient) CheckForSecret(secretUrl string) (secretValue string, err error) {
+	secretRef, err := secret.NewSecretReferenceFromURL(secretUrl)
 	if err != nil {
 		return "", err
 	}
 
-	switch secretRef.vaultType {
-	case VaultTypeAwsSecretsManager:
+	switch secretRef.VaultType {
+	case secret.VaultTypeAwsSecretsManager:
 		if vc.awsClient == nil {
 			vc.awsClient = aws.NewSecretsManager()
 		}
-		secret, err = vc.awsClient.GetSecret(secretRef.GetVaultAddress())
+		secretValue, err = vc.awsClient.GetSecret(secretRef.GetVaultAddress())
 	default:
 		// Do nothing
 	}
 
 	return
-}
-
-func IsSecretReference(potentialSecret string) bool {
-	refRegex := regexp.MustCompile(`(rsec:\/\/)([-a-zA-Z0-9_\+~#=]*)\.([a-z]*)\.([a-z]*)\/([-a-zA-Z0-9()@:%_\+.~#?&\/\/=]*)`)
-	return refRegex.MatchString(potentialSecret)
 }
 
 func GetIdentifierType(secretID string) SecretIdentifierType {

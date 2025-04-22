@@ -1,23 +1,29 @@
-package secrets
+package secret
 
 import (
 	"net/url"
+	"regexp"
 	"strings"
 )
 
+func IsSecretReference(potentialSecret string) bool {
+	refRegex := regexp.MustCompile(`(rsec:\/\/)([-a-zA-Z0-9_\+~#=]*)\.([a-z]*)\.([a-z]*)\/([-a-zA-Z0-9()@:%_\+.~#?&\/\/=]*)`)
+	return refRegex.MatchString(potentialSecret)
+}
+
 type SecretReference struct {
-	vaultName     string
-	vaultType     VaultType
-	secretName    string
-	region        string
-	secretVersion string
+	VaultName     string
+	VaultType     VaultType
+	SecretName    string
+	Region        string
+	SecretVersion string
 }
 
 func NewSecretReference(vaultName string, vaultType VaultType, secretName string) SecretReference {
 	return SecretReference{
-		vaultName:  vaultName,
-		vaultType:  vaultType,
-		secretName: secretName,
+		VaultName:  vaultName,
+		VaultType:  vaultType,
+		SecretName: secretName,
 	}
 }
 
@@ -49,31 +55,31 @@ func NewSecretReferenceFromURL(secretRef string) (SecretReference, error) {
 	secretVersion := parsedURL.Query().Get("version")
 
 	return SecretReference{
-		vaultName:     vaultName,
-		vaultType:     vaultTypeFromString(vaultType),
-		secretName:    secretName,
-		region:        region,
-		secretVersion: secretVersion,
+		VaultName:     vaultName,
+		VaultType:     vaultTypeFromString(vaultType),
+		SecretName:    secretName,
+		Region:        region,
+		SecretVersion: secretVersion,
 	}, nil
 }
 
 func (sr *SecretReference) SetSecretVersion(version string) {
-	sr.secretVersion = version
+	sr.SecretVersion = version
 }
 
 func (sr *SecretReference) SetRegion(region string) {
-	sr.region = region
+	sr.Region = region
 }
 
 func (sr *SecretReference) String() string {
 	// Example: rsec://123456789012.sm.aws/v1/my-secret?region=us-west-2
 	secretRef := url.URL{
 		Scheme: "rsec",
-		Host:   sr.vaultName,
+		Host:   sr.VaultName,
 	}
 
 	// Add the vault type
-	switch sr.vaultType {
+	switch sr.VaultType {
 	case VaultTypeAwsSecretsManager:
 		secretRef.Host += ".sm.aws"
 	case VaultTypeAzureKeyVault:
@@ -84,13 +90,13 @@ func (sr *SecretReference) String() string {
 		secretRef.Host += ".ERROR"
 	}
 
-	secretRef.Path = "/" + sr.secretName
+	secretRef.Path = "/" + sr.SecretName
 
-	if sr.region != "" {
-		secretRef.RawQuery = "region=" + sr.region
+	if sr.Region != "" {
+		secretRef.RawQuery = "region=" + sr.Region
 	}
-	if sr.secretVersion != "" {
-		secretRef.Path += "?" + sr.secretVersion
+	if sr.SecretVersion != "" {
+		secretRef.Path += "?" + sr.SecretVersion
 	}
 
 	return secretRef.String()
@@ -98,13 +104,13 @@ func (sr *SecretReference) String() string {
 
 func (sr *SecretReference) GetVaultAddress() string {
 	// Example: arn:aws:secretsmanager:us-west-2:123456789012:secret:my-secret
-	switch sr.vaultType {
+	switch sr.VaultType {
 	case VaultTypeAwsSecretsManager:
-		return "arn:aws:secretsmanager:" + sr.region + ":" + sr.vaultName + ":secret:" + sr.secretName
+		return "arn:aws:secretsmanager:" + sr.Region + ":" + sr.VaultName + ":secret:" + sr.SecretName
 	case VaultTypeAzureKeyVault:
-		return "https://" + sr.vaultName + ".vault.azure.net/secrets/" + sr.secretName
+		return "https://" + sr.VaultName + ".vault.azure.net/secrets/" + sr.SecretName
 	case VaultTypeGcpSecretsManager:
-		return "projects/" + sr.vaultName + "/secrets/" + sr.secretName
+		return "projects/" + sr.VaultName + "/secrets/" + sr.SecretName
 	default:
 		return "Invalid vault type"
 	}

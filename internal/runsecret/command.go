@@ -8,8 +8,9 @@ import (
 	"strings"
 
 	"github.com/creack/pty"
-	"github.com/runsecret/rsec/internal/secrets"
+	"github.com/runsecret/rsec/internal/vault"
 	"github.com/runsecret/rsec/pkg/envfile"
+	"github.com/runsecret/rsec/pkg/secret"
 )
 
 func Run(userCmd *exec.Cmd, envFilePath string) ([]byte, error) {
@@ -73,7 +74,7 @@ func setSecrets(cmd *exec.Cmd, envFilePath string) (envVars []string, redactList
 	}
 
 	// Replace secret references in ENV VARS
-	vaultClient := secrets.NewVaultClient()
+	vaultClient := vault.NewVaultClient()
 
 	for i, envVar := range envVars {
 		// Split env vars
@@ -82,19 +83,19 @@ func setSecrets(cmd *exec.Cmd, envFilePath string) (envVars []string, redactList
 		value := strings.TrimSpace(parts[1])
 
 		// Try to get secret from env var
-		var secret string
-		if secrets.IsSecretReference(value) {
-			secret, err = vaultClient.CheckForSecret(value)
+		var secretValue string
+		if secret.IsSecretReference(value) {
+			secretValue, err = vaultClient.CheckForSecret(value)
 			if err != nil {
 				return
 			}
 
 			// Only replace secret if it is not empty
-			if secret != "" {
+			if secretValue != "" {
 				// Replace the secret in the env var
-				envVars[i] = fmt.Sprintf("%s=%s", key, secret)
+				envVars[i] = fmt.Sprintf("%s=%s", key, secretValue)
 				// Add secret to list of secrets for redaction
-				redactList = append(redactList, secret)
+				redactList = append(redactList, secretValue)
 			}
 
 		}
