@@ -13,7 +13,7 @@ func ConvertAwsArnToRef(arn string) string {
 	region := parts[3]
 	account := parts[4]
 	secretName := parts[6]
-	secretRef := secretref.NewSecretReference(account, secretref.VaultTypeAwsSecretsManager, secretName)
+	secretRef := secretref.New(account, secretref.VaultTypeAwsSecretsManager, secretName)
 	secretRef.SetRegion(region)
 
 	return secretRef.String()

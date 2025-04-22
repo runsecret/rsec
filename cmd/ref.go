@@ -16,22 +16,22 @@ func NewRefCmd() *cobra.Command {
   rsec ref rsec://123456789012.sm.aws/my-secret?region=us-west-2`,
 		Run: func(cmd *cobra.Command, args []string) {
 			std := NewStd(cmd)
-			refOrAddr := args[0]
+			secretID := args[0]
 
 			var secretRef string
 			var vaultAddr string
-			switch vault.GetIdentifierType(refOrAddr) {
+			switch vault.GetIdentifierType(secretID) {
 			case vault.SecretIdentifierTypeAwsArn:
-				vaultAddr = refOrAddr
-				secretRef = vault.ConvertAwsArnToRef(refOrAddr)
+				vaultAddr = secretID
+				secretRef = vault.ConvertAwsArnToRef(secretID)
 			case vault.SecretIdentifierTypeRef:
-				secretReference, err := secretref.NewSecretReferenceFromString(refOrAddr)
+				secretReference, err := secretref.NewFromString(secretID)
 				if err != nil {
 					std.Err("❌ - Cannot parse secret reference ", err)
 					return
 				}
 				vaultAddr = secretReference.GetVaultAddress()
-				secretRef = refOrAddr
+				secretRef = secretID
 			default:
 				secretRef = "Invalid secret identifier"
 			}

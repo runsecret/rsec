@@ -21,7 +21,7 @@ func NewCopyCmd() *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			std := NewStd(cmd)
 			secretRef := args[0]
-			if !secretref.IsSecretReference(secretRef) {
+			if !secretref.IsSecretRef(secretRef) {
 				std.Err("❌ - Invalid secret reference provided!")
 				return
 			}

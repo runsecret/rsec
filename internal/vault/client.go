@@ -16,7 +16,7 @@ func NewClient() Client {
 }
 
 func (c Client) CheckForSecret(secretID string) (secretValue string, err error) {
-	secretRef, err := secretref.NewSecretReferenceFromString(secretID)
+	secretRef, err := secretref.NewFromString(secretID)
 	if err != nil {
 		return "", err
 	}

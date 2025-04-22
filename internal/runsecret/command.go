@@ -84,7 +84,7 @@ func setSecrets(cmd *exec.Cmd, envFilePath string) (envVars []string, redactList
 
 		// Try to get secret from env var
 		var secretValue string
-		if secretref.IsSecretReference(value) {
+		if secretref.IsSecretRef(value) {
 			secretValue, err = vaultClient.CheckForSecret(value)
 			if err != nil {
 				return

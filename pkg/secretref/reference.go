@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func IsSecretReference(potentialSecret string) bool {
+func IsSecretRef(potentialSecret string) bool {
 	refRegex := regexp.MustCompile(`(rsec:\/\/)([-a-zA-Z0-9_\+~#=]*)\.([a-z]*)\.([a-z]*)\/([-a-zA-Z0-9()@:%_\+.~#?&\/\/=]*)`)
 	return refRegex.MatchString(potentialSecret)
 }
@@ -19,7 +19,7 @@ type SecretReference struct {
 	SecretVersion string
 }
 
-func NewSecretReference(vaultName string, vaultType VaultType, secretName string) SecretReference {
+func New(vaultName string, vaultType VaultType, secretName string) SecretReference {
 	return SecretReference{
 		VaultName:  vaultName,
 		VaultType:  vaultType,
@@ -27,7 +27,7 @@ func NewSecretReference(vaultName string, vaultType VaultType, secretName string
 	}
 }
 
-func NewSecretReferenceFromString(secretRef string) (SecretReference, error) {
+func NewFromString(secretRef string) (SecretReference, error) {
 	// Example: rsec://123456789012.sm.aws/v1/my-secret?region=us-west-2
 	parsedURL, err := url.Parse(secretRef)
 	if err != nil {
