@@ -20,7 +20,7 @@ func TestCopyCommand(t *testing.T) {
 	cmd.SetOut(b)
 
 	// Set up command arguments
-	cmd.SetArgs([]string{"rsec://000000000000.sm.aws/test/api/keys?region=us-east-1"})
+	cmd.SetArgs([]string{"rsec://000000000000/sm.aws/test/api/keys?region=us-east-1"})
 
 	// Execute command
 	err := cmd.Execute()
@@ -65,7 +65,7 @@ func TestRunCommand(t *testing.T) {
 	cmd.SetArgs([]string{"--", "echo", "password1234"})
 
 	// Set up env vars
-	os.Setenv("PASSWORD", "rsec://000000000000.sm.aws/basicPassword?region=us-east-1")
+	os.Setenv("PASSWORD", "rsec://000000000000/sm.aws/basicPassword?region=us-east-1")
 
 	// Execute command
 	err := cmd.Execute()
@@ -93,7 +93,7 @@ func TestRefCommand(t *testing.T) {
 	cmd.SetOut(b)
 
 	// Set up command arguments
-	cmd.SetArgs([]string{"rsec://000000000000.sm.aws/test/api/keys?region=us-east-1"})
+	cmd.SetArgs([]string{"rsec://000000000000/sm.aws/test/api/keys?region=us-east-1"})
 
 	// Execute command
 	err := cmd.Execute()
@@ -104,7 +104,7 @@ func TestRefCommand(t *testing.T) {
 	out, err := io.ReadAll(b)
 	require.NoError(err)
 	assert.Equal(
-		"Secret Reference:  rsec://000000000000.sm.aws/test/api/keys?region=us-east-1\nVault Address:\t   arn:aws:secretsmanager:us-east-1:000000000000:secret:test/api/keys\n",
+		"Secret Reference:  rsec://000000000000/sm.aws/test/api/keys?region=us-east-1\nVault Address:\t   arn:aws:secretsmanager:us-east-1:000000000000:secret:test/api/keys\n",
 		string(out),
 	)
 }

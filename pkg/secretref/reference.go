@@ -7,28 +7,28 @@ import (
 )
 
 func IsSecretRef(potentialSecret string) bool {
-	refRegex := regexp.MustCompile(`(rsec:\/\/)([-a-zA-Z0-9_\+~#=]*)\.([a-z]*)\.([a-z]*)\/([-a-zA-Z0-9()@:%_\+.~#?&\/\/=]*)`)
+	refRegex := regexp.MustCompile(`(rsec:\/\/)([-a-zA-Z0-9_\+~#=:]*)\/([a-z]*\.[a-z]*)\/([-a-zA-Z0-9()@:%_\+.~#?&\/\/=]*)`)
 	return refRegex.MatchString(potentialSecret)
 }
 
 type SecretReference struct {
-	VaultName     string
-	VaultType     VaultType
-	SecretName    string
-	Region        string
-	SecretVersion string
+	VaultProviderAddress string
+	VaultType            VaultType
+	SecretName           string
+	Region               string
+	SecretVersion        string
 }
 
-func New(vaultName string, vaultType VaultType, secretName string) SecretReference {
+func New(vaultProviderAddress string, vaultType VaultType, secretName string) SecretReference {
 	return SecretReference{
-		VaultName:  vaultName,
-		VaultType:  vaultType,
-		SecretName: secretName,
+		VaultProviderAddress: vaultProviderAddress,
+		VaultType:            vaultType,
+		SecretName:           secretName,
 	}
 }
 
 func NewFromString(secretRef string) (SecretReference, error) {
-	// Example: rsec://123456789012.sm.aws/v1/my-secret?region=us-west-2
+	// Example: rsec://123456789012/sm.aws/v1/my-secret?region=us-west-2
 	parsedURL, err := url.Parse(secretRef)
 	if err != nil {
 		return SecretReference{}, err
@@ -36,17 +36,15 @@ func NewFromString(secretRef string) (SecretReference, error) {
 	if parsedURL.Scheme != "rsec" {
 		return SecretReference{}, err
 	}
-	// Extract the vault name and type from the host
-	hostParts := parsedURL.Hostname()
-	hostPartsSplit := strings.SplitN(hostParts, ".", 2)
-	if len(hostPartsSplit) < 2 {
-		return SecretReference{}, err
-	}
-	vaultName := hostPartsSplit[0]
-	vaultType := hostPartsSplit[1]
+	// The host is always the vaultProviderAddress
+	vaultProviderAddress := parsedURL.Hostname()
+
+	// Get vaultType from first section of Path
+	pathSegments := strings.SplitN(parsedURL.Path[1:], "/", 2)
+	vaultType := pathSegments[0]
 
 	// Extract the secret name from the path
-	secretName := parsedURL.Path[1:] // Remove leading "/"
+	secretName := pathSegments[1]
 
 	// Extract the region from the query parameters
 	region := parsedURL.Query().Get("region")
@@ -55,11 +53,11 @@ func NewFromString(secretRef string) (SecretReference, error) {
 	secretVersion := parsedURL.Query().Get("version")
 
 	return SecretReference{
-		VaultName:     vaultName,
-		VaultType:     vaultTypeFromString(vaultType),
-		SecretName:    secretName,
-		Region:        region,
-		SecretVersion: secretVersion,
+		VaultProviderAddress: vaultProviderAddress,
+		VaultType:            vaultTypeFromString(vaultType),
+		SecretName:           secretName,
+		Region:               region,
+		SecretVersion:        secretVersion,
 	}, nil
 }
 
@@ -72,25 +70,26 @@ func (sr *SecretReference) SetRegion(region string) {
 }
 
 func (sr *SecretReference) String() string {
-	// Example: rsec://123456789012.sm.aws/v1/my-secret?region=us-west-2
-	secretRef := url.URL{
+	// Example: rsec://123456789012/sm.aws/v1/my-secret?region=us-west-2
+	secretRef := &url.URL{
 		Scheme: "rsec",
-		Host:   sr.VaultName,
+		Host:   sr.VaultProviderAddress,
 	}
 
 	// Add the vault type
 	switch sr.VaultType {
 	case VaultTypeAwsSecretsManager:
-		secretRef.Host += ".sm.aws"
+		secretRef = secretRef.JoinPath("sm.aws")
 	case VaultTypeAzureKeyVault:
-		secretRef.Host += ".kv.azure"
+		secretRef = secretRef.JoinPath("kv.azure")
 	case VaultTypeGcpSecretsManager:
-		secretRef.Host += ".sm.gcp"
+		secretRef = secretRef.JoinPath("sm.gcp")
 	default:
-		secretRef.Host += ".ERROR"
+		secretRef = secretRef.JoinPath("ERROR")
 	}
 
-	secretRef.Path = "/" + sr.SecretName
+	// Add secretName to the path
+	secretRef = secretRef.JoinPath(sr.SecretName)
 
 	if sr.Region != "" {
 		secretRef.RawQuery = "region=" + sr.Region
@@ -106,11 +105,11 @@ func (sr *SecretReference) GetVaultAddress() string {
 	// Example: arn:aws:secretsmanager:us-west-2:123456789012:secret:my-secret
 	switch sr.VaultType {
 	case VaultTypeAwsSecretsManager:
-		return "arn:aws:secretsmanager:" + sr.Region + ":" + sr.VaultName + ":secret:" + sr.SecretName
+		return "arn:aws:secretsmanager:" + sr.Region + ":" + sr.VaultProviderAddress + ":secret:" + sr.SecretName
 	case VaultTypeAzureKeyVault:
-		return "https://" + sr.VaultName + ".vault.azure.net/secrets/" + sr.SecretName
+		return "https://" + sr.VaultProviderAddress + ".vault.azure.net/secrets/" + sr.SecretName
 	case VaultTypeGcpSecretsManager:
-		return "projects/" + sr.VaultName + "/secrets/" + sr.SecretName
+		return "projects/" + sr.VaultProviderAddress + "/secrets/" + sr.SecretName
 	default:
 		return "Invalid vault type"
 	}

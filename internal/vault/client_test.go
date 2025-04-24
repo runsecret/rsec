@@ -20,7 +20,7 @@ func TestGetIdentifierType(t *testing.T) {
 		},
 		{
 			name: "AWS",
-			str:  "rsec://000000000000.sm.aws/MyTestSecret?region=us-east-1",
+			str:  "rsec://000000000000/sm.aws/MyTestSecret?region=us-east-1",
 			want: SecretIdentifierTypeRef,
 		},
 		{

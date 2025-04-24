@@ -97,7 +97,6 @@ func setSecrets(cmd *exec.Cmd, envFilePath string) (envVars []string, redactList
 				// Add secret to list of secrets for redaction
 				redactList = append(redactList, secretValue)
 			}
-
 		}
 	}
 

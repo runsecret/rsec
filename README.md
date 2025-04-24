@@ -72,7 +72,7 @@ Make sure your `GOPATH/bin` directory is in your system path.
 
    Use a secret reference:
    ```
-   DATABASE_PASSWORD=rsec://012345678912.sm.aws/MyDatabasePassword?region=us-east-1
+   DATABASE_PASSWORD=rsec://012345678912/sm.aws/MyDatabasePassword?region=us-east-1
    ```
 
 3. **Run your application with rsec**
@@ -93,19 +93,19 @@ Secret references point to secrets in your vault. The format depends on the vaul
 For **AWS Secrets Manager**:
 
 ```
-rsec://<account_number>.sm.aws/<secret_name>?region=<region>
+rsec://<account_number>/sm.aws/<secret_name>?region=<region>
 ```
 
 Example:
 ```
-rsec://012345678912.sm.aws/MyDatabasePassword?region=us-east-1
+rsec://012345678912/sm.aws/MyDatabasePassword?region=us-east-1
 ```
 
 Use the `rsec ref` command to generate references from ARNs:
 
 ```bash
 $ rsec ref arn:aws:secretsmanager:us-east-1:012345678912:secret:MyDatabasePassword
-Secret Reference:  rsec://012345678912.sm.aws/MyTestSecret?region=us-east-1
+Secret Reference:  rsec://012345678912/sm.aws/MyTestSecret?region=us-east-1
 Vault Address: arn:aws:secretsmanager:us-east-1:012345678912:secret:MyDatabasePassword
 ```
 
@@ -117,8 +117,8 @@ Here's a complete workflow example:
 
    ```bash
    # myapp/.env
-   DATABASE_URL=rsec://012345678912.sm.aws/DatabasePassword?region=us-east-1
-   API_KEY=rsec://012345678912.sm.aws/ApiKey?region=us-east-1
+   DATABASE_URL=rsec://012345678912/sm.aws/DatabasePassword?region=us-east-1
+   API_KEY=rsec://012345678912/sm.aws/ApiKey?region=us-east-1
    ```
 
 2. **Commit this file to your repository**
@@ -162,7 +162,7 @@ rsec copy <secret-reference>
 
 Example:
 ```bash
-rsec copy rsec://012345678912.sm.aws/MyApiKey?region=us-east-1
+rsec copy rsec://012345678912/sm.aws/MyApiKey?region=us-east-1
 ```
 
 ### `rsec ref`
