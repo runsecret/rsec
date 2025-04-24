@@ -88,23 +88,41 @@ Make sure your `GOPATH/bin` directory is in your system path.
 
 ## Secret Reference Format
 
-Secret references point to secrets in your vault. The format depends on the vault provider.
+Secret references point to secrets in your vault. The format is consistent across all supported secret vaults, though optional arguments may only apply to specific Secret Vaults which support or require thoe features.
 
-For **AWS Secrets Manager**:
+### General Secret Reference Format
 
+All secret references conform to the following format:
+
+```bash
+rsec://<vaultProviderAddress>/<vaultType>/<secretNameOrPath>?<arguments>
 ```
-rsec://<account_number>/sm.aws/<secret_name>?region=<region>
+
+where:
+* `vaultProviderAddress`: Is the minimum address required to reach out to the vault. For AWS this is simply the account number you want to use. For other, self-hosted vaults, it will be the full hostname used to reach the vault.
+* `vaultType`: Is a specific string that tells `rsec` which vault provider this secret lives in.
+* `secretNameOrPath`: Is the full path (where applicable) or name of the secret you want to access.
+* `arguments`: Are optional arguments provided as query parameters to configure how to access the secret value. Note: Some arguments may only apply for certain secret vaults. These will be documented for each secret vault provider.
+
+### AWS Secrets Manager
+
+Being more specific from the general format defined above, all AWS Secrets Manager references are constructed with the following values:
+```bash
+rsec://<accountNumber>/sm.aws/<secretName>?region=<region>
 ```
+
+The `region` attribute is currently only applicable to AWS Secrets Manager references, and will appear on all secret references for this provider.
 
 Example:
 ```
-rsec://012345678912/sm.aws/MyDatabasePassword?region=us-east-1
+rsec://012345678912/sm.aws/DatabasePassword?region=us-east-1
 ```
 
-Use the `rsec ref` command to generate references from ARNs:
+
+Tip: Use the `rsec ref` command to generate references from ARNs or vice versa:
 
 ```bash
-$ rsec ref arn:aws:secretsmanager:us-east-1:012345678912:secret:MyDatabasePassword
+$ rsec ref arn:aws:secretsmanager:us-east-1:012345678912:secret:DatabasePassword
 Secret Reference:  rsec://012345678912/sm.aws/MyTestSecret?region=us-east-1
 Vault Address: arn:aws:secretsmanager:us-east-1:012345678912:secret:MyDatabasePassword
 ```
@@ -123,19 +141,20 @@ Here's a complete workflow example:
 
 2. **Commit this file to your repository**
 
-   Since it contains only references, not actual secrets, it's safe to commit.
+   Since it contains only references, not actual secrets, it's safe to commit and share with your team.
 
 3. **Run your application using rsec**
 
+  For example:
    ```bash
-   rsec run -e myapp/.env -- npm start
+   rsec run -e .env -- npm start
    ```
 
 4. **What happens behind the scenes:**
    - RunSecret loads the .env file
    - Retrieves actual secrets from AWS Secrets Manager
-   - Injects them into the environment for your application
-   - Monitors stdout/stderr to redact any accidental leaks
+   - Injects them into the environment **only** for your application
+   - Monitors stdout/stderr and redacts any accidental leaks of those secrets
 
 ## Commands Reference
 
@@ -154,7 +173,7 @@ rsec run -e .env -- npm run dev --prefix ./my_app
 
 ### `rsec copy`
 
-Copies a secret value to your clipboard securely.
+Retrieves and copies a secret value directly to your clipboard securely.
 
 ```bash
 rsec copy <secret-reference>
@@ -167,7 +186,7 @@ rsec copy rsec://012345678912/sm.aws/MyApiKey?region=us-east-1
 
 ### `rsec ref`
 
-Generates a secret reference from a vault address.
+Generates a secret reference from a vault address, or vice versa.
 
 ```bash
 rsec ref <vault-address>
@@ -185,15 +204,14 @@ rsec ref arn:aws:secretsmanager:us-east-1:012345678912:secret:MyApiKey
 **Authentication:**
 - Uses standard AWS SDK authentication
 - Supports environment variables, shared credentials file, IAM roles
-- Configure using AWS CLI: `aws configure`
 
 **Limitations:**
 - Only supports string values (not binary)
-- Does not support secret rotation
 
 ### Upcoming Vault Support (Roadmap)
-- GCP Secret Manager
 - Azure Key Vault
+- GCP Secret Manager
+- AWS Parameter Store
 - HashiCorp Vault
 
 ## Contributing
@@ -201,9 +219,9 @@ rsec ref arn:aws:secretsmanager:us-east-1:012345678912:secret:MyApiKey
 Contributions are welcome! Please feel free to submit a Pull Request.
 
 1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+2. Create your feature branch (`git checkout -b feat/amazing-feature`)
 3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
+4. Push to the branch (`git push origin feat/amazing-feature`)
 5. Open a Pull Request
 
 ## License
