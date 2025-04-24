@@ -1,6 +1,7 @@
 package vault
 
 import (
+	"errors"
 	"regexp"
 
 	"github.com/runsecret/rsec/pkg/aws"
@@ -28,7 +29,7 @@ func (c Client) GetSecret(secretID string) (secret string, err error) {
 		}
 		secret, err = c.awsClient.GetSecret(secretRef.GetVaultAddress())
 	default:
-		// TODO: Return error if the vault type is not supported
+		return "", errors.New("secret vault type unsupported")
 	}
 
 	return
