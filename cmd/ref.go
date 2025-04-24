@@ -1,7 +1,8 @@
 package cmd
 
 import (
-	"github.com/runsecret/rsec/internal/secrets"
+	"github.com/runsecret/rsec/internal/vault"
+	"github.com/runsecret/rsec/pkg/secretref"
 	"github.com/spf13/cobra"
 )
 
@@ -12,20 +13,25 @@ func NewRefCmd() *cobra.Command {
 		Short: "Get the secret reference and vault address from a provided secret",
 		Long:  `Get the secret reference and vault address from a provided secret`,
 		Example: `  rsec ref arn:aws:secretsmanager:us-west-2:123456789012:secret:my-secret
-  rsec ref aws://us-west-2/123456789012/my-secret`,
+  rsec ref rsec://123456789012/sm.aws/my-secret?region=us-west-2`,
 		Run: func(cmd *cobra.Command, args []string) {
 			std := NewStd(cmd)
-			refOrAddr := args[0]
+			secretID := args[0]
 
 			var secretRef string
 			var vaultAddr string
-			switch secrets.GetIdentifierType(refOrAddr) {
-			case secrets.SecretIdentifierTypeAwsArn:
-				vaultAddr = refOrAddr
-				secretRef = secrets.ConvertAwsArnToAwsRef(refOrAddr)
-			case secrets.SecretIdentifierTypeAwsRef:
-				vaultAddr = secrets.ConvertAwsRefToAwsArn(refOrAddr)
-				secretRef = refOrAddr
+			switch vault.GetIdentifierType(secretID) {
+			case vault.SecretIdentifierTypeAwsArn:
+				vaultAddr = secretID
+				secretRef = vault.ConvertAwsArnToRef(secretID)
+			case vault.SecretIdentifierTypeRef:
+				secretReference, err := secretref.NewFromString(secretID)
+				if err != nil {
+					std.Err("❌ - Cannot parse secret reference ", err)
+					return
+				}
+				vaultAddr = secretReference.GetVaultAddress()
+				secretRef = secretID
 			default:
 				secretRef = "Invalid secret identifier"
 			}
