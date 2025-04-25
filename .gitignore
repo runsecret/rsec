@@ -26,3 +26,5 @@ go.work.sum
 
 # localstack
 volume/
+# Added by goreleaser init:
+dist/
