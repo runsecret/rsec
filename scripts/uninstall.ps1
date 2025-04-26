@@ -15,15 +15,15 @@ if (-not (Test-Path $BinaryPath)) {
 
 # Remove the binary and installation directory
 try {
+    # Remove the binary file
     Remove-Item -Path $BinaryPath -Force
+    Write-Host "Removed $BinaryName executable"
 
     # Remove the directory if it's empty
     if ((Get-ChildItem -Path $InstallDir -Force | Measure-Object).Count -eq 0) {
         Remove-Item -Path $InstallDir -Force
         Write-Host "Removed installation directory: $InstallDir"
     }
-
-    Write-Host "$BinaryName has been successfully uninstalled."
 
     # Remove from PATH
     $currentPath = [Environment]::GetEnvironmentVariable("Path", "User")
@@ -33,7 +33,10 @@ try {
         Write-Host "Removed $InstallDir from PATH"
     }
 
+    Write-Host "$BinaryName has been successfully uninstalled."
 } catch {
-    Write-Host "Failed to uninstall $BinaryName: $_"
+    # Properly capture and display the error
+    $errorMessage = $_.Exception.Message
+    Write-Host "Failed to uninstall $BinaryName: $errorMessage"
     exit 1
 }
