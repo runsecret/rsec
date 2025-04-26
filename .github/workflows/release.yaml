@@ -1,8 +1,9 @@
 name: release
 
 on:
-  release:
-    types: [released]
+  push:
+    tags:
+      - "*"
 
 permissions:
   contents: write
