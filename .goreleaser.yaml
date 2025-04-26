@@ -57,7 +57,8 @@ brews:
       email: devenjarvis@gmail.com
     commit_msg_template: "Brew formula update for {{ .ProjectName }} version {{ .Tag }}"
     directory: Formula
-    description: "Simple, powerful, and secure secret management for your applications."
+    homepage: "https://github.com/runsecret/rsec"
+    description: "Simple, powerful, and secure secret management for your applications"
     license: "MIT"
     repository:
       owner: runsecret
