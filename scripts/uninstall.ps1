@@ -20,23 +20,26 @@ try {
     Write-Host "Removed $BinaryName executable"
 
     # Remove the directory if it's empty
-    if ((Get-ChildItem -Path $InstallDir -Force | Measure-Object).Count -eq 0) {
+    $dirItems = Get-ChildItem -Path $InstallDir -Force -ErrorAction SilentlyContinue
+    if (-not $dirItems -or $dirItems.Count -eq 0) {
         Remove-Item -Path $InstallDir -Force
         Write-Host "Removed installation directory: $InstallDir"
     }
 
     # Remove from PATH
     $currentPath = [Environment]::GetEnvironmentVariable("Path", "User")
-    if ($currentPath.Contains($InstallDir)) {
-        $newPath = ($currentPath.Split(';') | Where-Object { $_ -ne $InstallDir }) -join ';'
+    if ($currentPath -and $currentPath.Contains($InstallDir)) {
+        $pathParts = $currentPath.Split(';')
+        $newPathParts = $pathParts | Where-Object { $_ -ne $InstallDir }
+        $newPath = $newPathParts -join ';'
         [Environment]::SetEnvironmentVariable("Path", $newPath, "User")
         Write-Host "Removed $InstallDir from PATH"
     }
 
     Write-Host "$BinaryName has been successfully uninstalled."
 } catch {
-    # Properly capture and display the error
-    $errorMessage = $_.Exception.Message
-    Write-Host "Failed to uninstall $BinaryName: $errorMessage"
+    # Catch and display error without using $_ directly in strings
+    $errorMsg = $_.Exception.Message
+    Write-Host ("Failed to uninstall " + $BinaryName + ": " + $errorMsg)
     exit 1
 }
