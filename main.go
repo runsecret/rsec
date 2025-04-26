@@ -5,9 +5,9 @@ package main
 
 import "github.com/runsecret/rsec/cmd"
 
-var Version = "local"
+var version = "local"
 
 func main() {
-	cmd.SetVersion(Version)
+	cmd.SetVersion(version)
 	cmd.Execute()
 }
