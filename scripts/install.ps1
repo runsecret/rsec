@@ -38,7 +38,7 @@ $version = $latestRelease.tag_name
 Write-Host "Latest release: $version"
 
 # Construct download URL
-$downloadUrl = "https://github.com/$GithubRepo/releases/download/$version/${BinaryName}_Windows_${arch}.tar.gz"
+$downloadUrl = "https://github.com/$GithubRepo/releases/download/$version/${BinaryName}_Windows_${arch}.zip"
 Write-Host "Downloading from: $downloadUrl"
 
 # Create temporary folder
@@ -46,13 +46,12 @@ $tempFolder = Join-Path $env:TEMP ([Guid]::NewGuid().ToString())
 New-Item -ItemType Directory -Path $tempFolder -Force | Out-Null
 
 # Download the release
-$tarGzPath = Join-Path $tempFolder "release.tar.gz"
-Invoke-WebRequest -Uri $downloadUrl -OutFile $tarGzPath
+$zipPath = Join-Path $tempFolder "release.zip"
+Invoke-WebRequest -Uri $downloadUrl -OutFile $zipPath
 
 # Extract the archive
 Write-Host "Extracting..."
-# PowerShell 5.1+ has Expand-Archive, but we need to handle tar.gz
-tar -xzf $tarGzPath -C $tempFolder
+Expand-Archive -Path $zipPath -DestinationPath $tempFolder
 
 # Install the binary
 $sourceBinary = Join-Path $tempFolder "$BinaryName.exe"
