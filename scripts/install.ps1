@@ -28,7 +28,7 @@ $arch = if ([Environment]::Is64BitOperatingSystem) {
         "x86_64"
     }
 } else {
-    "386"
+    "i386"
 }
 
 # Get latest release info
