@@ -44,3 +44,29 @@ changelog:
     exclude:
       - "^docs:"
       - "^test:"
+
+brews:
+  # Name of the recipe
+  #
+  # Default: the project name.
+  # Templates: allowed.
+  - name: rsec
+    url_template: "https://github.com/runsecret/rsec/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
+    commit_author:
+      name: devenjarvis
+      email: devenjarvis@gmail.com
+    commit_msg_template: "Brew formula update for {{ .ProjectName }} version {{ .Tag }}"
+    directory: Formula
+    description: "Simple, powerful, and secure secret management for your applications."
+    license: "MIT"
+    repository:
+      owner: runsecret
+      name: homebrew-tap
+      branch: main
+      pull_request:
+        enabled: true
+        draft: false
+        base:
+          owner: runsecret
+          name: homebrew-tap
+          branch: main
