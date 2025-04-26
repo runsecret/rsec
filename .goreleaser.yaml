@@ -16,9 +16,7 @@ before:
     - go generate ./...
 
 builds:
-  - ldflags:
-      - -s -w -X main.Version={{.Version}}
-    env:
+  - env:
       - CGO_ENABLED=0
     goos:
       - linux
