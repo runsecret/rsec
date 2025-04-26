@@ -62,7 +62,9 @@ brews:
     repository:
       owner: runsecret
       name: homebrew-tap
-      branch: main
       pull_request:
         enabled: true
         draft: false
+        base:
+          owner: runsecret
+          name: homebrew-tap
