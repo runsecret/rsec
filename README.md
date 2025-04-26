@@ -18,6 +18,7 @@ RunSecret (rsec) is a CLI tool that simplifies secret management for local devel
 - [Commands Reference](#commands-reference)
 - [Supported Secret Vaults](#supported-secret-vaults)
 - [Troubleshooting](#troubleshooting)
+- [Uninstalling](#uninstalling)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -51,11 +52,29 @@ RunSecret uses **secret references** to solve these problems:
 
 ## Installation
 
+### macOS (Homebrew)
+If you use Homebrew, you can install RunSecret with the following command:
 ```bash
-go install github.com/runsecret/rsec@latest
+brew install runsecret/tap/rsec
 ```
 
-Make sure your `GOPATH/bin` directory is in your system path.
+### Linux/macOS (curl)
+For Linux and macOS, you can use the following command to install RunSecret:
+```bash
+curl -sSL https://raw.githubusercontent.com/runsecret/rsec/main/scripts/install.sh | sh
+```
+
+### Linux/macOS (wget)
+For Linux and macOS, you can use the following command to install RunSecret:
+```bash
+wget -qO- https://raw.githubusercontent.com/runsecret/rsec/main/scripts/install.sh | bash
+```
+
+### Windows (PowerShell):
+For Windows, you can use the following command to install RunSecret:
+```powershell
+iwr -useb https://raw.githubusercontent.com/runsecret/rsec/main/scripts/install.ps1 | iex
+```
 
 ## Quick Start
 
@@ -213,6 +232,26 @@ rsec ref arn:aws:secretsmanager:us-east-1:012345678912:secret:MyApiKey
 - GCP Secret Manager
 - AWS Parameter Store
 - HashiCorp Vault
+
+## Uninstalling
+We recommend using the same method you used to install RunSecret to uninstall it. For example, if you installed it with Homebrew, you can uninstall it with:
+```bash
+brew uninstall runsecret/tap/rsec
+```
+If you installed it with the install script, you can uninstall it with:
+```bash
+curl -sSL https://raw.githubusercontent.com/runsecret/rsec/main/scripts/uninstall.sh | bash
+```
+Or with wget:
+```bash
+wget -qO- https://raw.githubusercontent.com/runsecret/rsec/main/scripts/uninstall.sh | bash
+```
+Or with PowerShell:
+```powershell
+iwr -useb https://raw.githubusercontent.com/runsecret/rsec/main/scripts/uninstall.ps1 | iex
+```
+
+
 
 ## Contributing
 

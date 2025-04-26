@@ -25,7 +25,7 @@ $arch = if ([Environment]::Is64BitOperatingSystem) {
     if ([System.Runtime.InteropServices.RuntimeInformation]::ProcessArchitecture -eq [System.Runtime.InteropServices.Architecture]::Arm64) {
         "arm64"
     } else {
-        "amd64"
+        "x86_64"
     }
 } else {
     "386"
