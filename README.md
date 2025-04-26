@@ -61,7 +61,7 @@ brew install runsecret/tap/rsec
 ### Linux/macOS (curl)
 For Linux and macOS, you can use the following command to install RunSecret:
 ```bash
-curl -sSL https://raw.githubusercontent.com/runsecret/rsec/main/scripts/install.sh | sh
+curl -sSL https://raw.githubusercontent.com/runsecret/rsec/main/scripts/install.sh | bash
 ```
 
 ### Linux/macOS (wget)
