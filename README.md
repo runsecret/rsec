@@ -17,7 +17,6 @@ RunSecret (rsec) is a CLI tool that simplifies secret management for local devel
 - [Complete Example](#complete-example)
 - [Commands Reference](#commands-reference)
 - [Supported Secret Vaults](#supported-secret-vaults)
-- [Troubleshooting](#troubleshooting)
 - [Uninstalling](#uninstalling)
 - [Contributing](#contributing)
 - [License](#license)
