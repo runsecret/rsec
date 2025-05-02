@@ -17,6 +17,7 @@ type SecretReference struct {
 	SecretName           string
 	Region               string
 	SecretVersion        string
+	Provider             string
 }
 
 func New(vaultProviderAddress string, vaultType VaultType, secretName string) SecretReference {
@@ -52,17 +53,25 @@ func NewFromString(secretRef string) (SecretReference, error) {
 	// Extract the secret version from the path if it exists
 	secretVersion := parsedURL.Query().Get("version")
 
+	// Extract the secret version from the path if it exists
+	provider := parsedURL.Query().Get("provider")
+
 	return SecretReference{
 		VaultProviderAddress: vaultProviderAddress,
 		VaultType:            vaultTypeFromString(vaultType),
 		SecretName:           secretName,
 		Region:               region,
 		SecretVersion:        secretVersion,
+		Provider:             provider,
 	}, nil
 }
 
 func (sr *SecretReference) SetSecretVersion(version string) {
 	sr.SecretVersion = version
+}
+
+func (sr *SecretReference) SetProvider(provider string) {
+	sr.Provider = provider
 }
 
 func (sr *SecretReference) SetRegion(region string) {
