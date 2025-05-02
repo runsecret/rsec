@@ -153,7 +153,7 @@ func TestRefCommand_AzureArn(t *testing.T) {
 	out, err := io.ReadAll(b)
 	require.NoError(err)
 	assert.Equal(
-		"Secret Reference:  azure://myvaultname/mysecretname\nVault Address:\t   https://myvaultname.vault.azure.net/secrets/mysecretname/\n",
+		"Secret Reference:  rsec://myvaultname/kv.azure/mysecretname\nVault Address:\t   https://myvaultname.vault.azure.net/secrets/mysecretname/\n",
 		string(out),
 	)
 }
@@ -168,7 +168,7 @@ func TestRefCommand_AzureRef(t *testing.T) {
 	cmd.SetOut(b)
 
 	// Set up command arguments
-	cmd.SetArgs([]string{"azure://myvaultname/mysecretname"})
+	cmd.SetArgs([]string{"rsec://myvaultname/kv.azure/mysecretname"})
 
 	// Execute command
 	err := cmd.Execute()
@@ -179,7 +179,7 @@ func TestRefCommand_AzureRef(t *testing.T) {
 	out, err := io.ReadAll(b)
 	require.NoError(err)
 	assert.Equal(
-		"Secret Reference:  azure://myvaultname/mysecretname\nVault Address:\t   https://myvaultname.vault.azure.net/secrets/mysecretname/\n",
+		"Secret Reference:  rsec://myvaultname/kv.azure/mysecretname\nVault Address:\t   https://myvaultname.vault.azure.net/secrets/mysecretname\n",
 		string(out),
 	)
 }
