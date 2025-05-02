@@ -19,8 +19,8 @@ type SecretsManager struct {
 	client      SecretsManagerAPI
 }
 
-func NewSecretsManager() SecretsManager {
-	return SecretsManager{}
+func NewSecretsManager() *SecretsManager {
+	return &SecretsManager{}
 }
 
 func (s *SecretsManager) getClient() SecretsManagerAPI {

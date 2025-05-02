@@ -19,8 +19,8 @@ type KeyVault struct {
 	client KeyVaultClientAPI
 }
 
-func NewKeyVault() KeyVault {
-	return KeyVault{}
+func NewKeyVault() *KeyVault {
+	return &KeyVault{}
 }
 
 func getBaseURL(fullURL string) (string, error) {
