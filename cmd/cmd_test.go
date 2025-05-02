@@ -33,6 +33,29 @@ func TestCopyCommand(t *testing.T) {
 	assert.Equal("✓ - Secret copied to clipboard!\n", string(out))
 }
 
+func TextCopyCommand_Azure(t *testing.T) {
+	require := require.New(t)
+	assert := assert.New(t)
+	cmd := NewCopyCmd()
+
+	// Capture output
+	b := bytes.NewBufferString("")
+	cmd.SetOut(b)
+
+	// Set up command arguments
+	cmd.SetArgs([]string{"azure://myvaultname/mysecretname"})
+
+	// Execute command
+	err := cmd.Execute()
+	// Expect no error
+	require.NoError(err)
+
+	// Ensure output is as expected
+	out, err := io.ReadAll(b)
+	require.NoError(err)
+	assert.Equal("✓ - Secret copied to clipboard!\n", string(out))
+}
+
 func TestCopyCommand_MissingArgument(t *testing.T) {
 	require := require.New(t)
 	cmd := NewCopyCmd()
@@ -105,6 +128,58 @@ func TestRefCommand(t *testing.T) {
 	require.NoError(err)
 	assert.Equal(
 		"Secret Reference:  rsec://000000000000/sm.aws/test/api/keys?region=us-east-1\nVault Address:\t   arn:aws:secretsmanager:us-east-1:000000000000:secret:test/api/keys\n",
+		string(out),
+	)
+}
+
+func TestRefCommand_AzureArn(t *testing.T) {
+	require := require.New(t)
+	assert := assert.New(t)
+	cmd := NewRefCmd()
+
+	// Capture output
+	b := bytes.NewBufferString("")
+	cmd.SetOut(b)
+
+	// Set up command arguments
+	cmd.SetArgs([]string{"https://myvaultname.vault.azure.net/secrets/mysecretname/"})
+
+	// Execute command
+	err := cmd.Execute()
+	// Expect no error
+	require.NoError(err)
+
+	// Ensure output is as expected
+	out, err := io.ReadAll(b)
+	require.NoError(err)
+	assert.Equal(
+		"Secret Reference:  azure://myvaultname/mysecretname\nVault Address:\t   https://myvaultname.vault.azure.net/secrets/mysecretname/\n",
+		string(out),
+	)
+}
+
+func TestRefCommand_AzureRef(t *testing.T) {
+	require := require.New(t)
+	assert := assert.New(t)
+	cmd := NewRefCmd()
+
+	// Capture output
+	b := bytes.NewBufferString("")
+	cmd.SetOut(b)
+
+	// Set up command arguments
+	cmd.SetArgs([]string{"azure://myvaultname/mysecretname"})
+
+	// Execute command
+	err := cmd.Execute()
+	// Expect no error
+	require.NoError(err)
+
+	// Ensure output is as expected
+	out, err := io.ReadAll(b)
+	require.NoError(err)
+	assert.Equal(
+		"Secret Reference:  azure://myvaultname/mysecretname\nVault Address:\t   https://myvaultname.vault.azure.net/secrets/mysecretname/\n",
 		string(out),
 	)
 }

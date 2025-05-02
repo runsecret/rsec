@@ -24,6 +24,9 @@ func NewRefCmd() *cobra.Command {
 			case vault.SecretIdentifierTypeAwsArn:
 				vaultAddr = secretID
 				secretRef = vault.ConvertAwsArnToRef(secretID)
+			case vault.SecretIdentifierTypeAzureArn:
+				vaultAddr = secretID
+				secretRef = vault.ConvertAzureArnToRef(secretID)
 			case vault.SecretIdentifierTypeRef:
 				secretReference, err := secretref.NewFromString(secretID)
 				if err != nil {
