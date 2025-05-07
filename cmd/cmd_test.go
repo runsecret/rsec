@@ -33,7 +33,7 @@ func TestCopyCommand(t *testing.T) {
 	assert.Equal("✓ - Secret copied to clipboard!\n", string(out))
 }
 
-func TextCopyCommand_Azure(t *testing.T) {
+func TestCopyCommand_Azure(t *testing.T) {
 	require := require.New(t)
 	assert := assert.New(t)
 	cmd := NewCopyCmd()
@@ -43,7 +43,7 @@ func TextCopyCommand_Azure(t *testing.T) {
 	cmd.SetOut(b)
 
 	// Set up command arguments
-	cmd.SetArgs([]string{"azure://myvaultname/mysecretname"})
+	cmd.SetArgs([]string{"rsec://rsec-test/kv.azure/basic-secret"})
 
 	// Execute command
 	err := cmd.Execute()

@@ -17,7 +17,6 @@ type SecretReference struct {
 	SecretName           string
 	Region               string
 	SecretVersion        string
-	Provider             string
 }
 
 func New(vaultProviderAddress string, vaultType VaultType, secretName string) SecretReference {
@@ -38,7 +37,7 @@ func NewFromString(secretRef string) (SecretReference, error) {
 		return SecretReference{}, err
 	}
 	// The host is always the vaultProviderAddress
-	vaultProviderAddress := parsedURL.Hostname()
+	vaultProviderAddress := parsedURL.Host
 
 	// Get vaultType from first section of Path
 	pathSegments := strings.SplitN(parsedURL.Path[1:], "/", 2)
@@ -53,25 +52,17 @@ func NewFromString(secretRef string) (SecretReference, error) {
 	// Extract the secret version from the path if it exists
 	secretVersion := parsedURL.Query().Get("version")
 
-	// Extract the secret version from the path if it exists
-	provider := parsedURL.Query().Get("provider")
-
 	return SecretReference{
 		VaultProviderAddress: vaultProviderAddress,
 		VaultType:            vaultTypeFromString(vaultType),
 		SecretName:           secretName,
 		Region:               region,
 		SecretVersion:        secretVersion,
-		Provider:             provider,
 	}, nil
 }
 
 func (sr *SecretReference) SetSecretVersion(version string) {
 	sr.SecretVersion = version
-}
-
-func (sr *SecretReference) SetProvider(provider string) {
-	sr.Provider = provider
 }
 
 func (sr *SecretReference) SetRegion(region string) {
@@ -91,6 +82,12 @@ func (sr *SecretReference) String() string {
 		secretRef = secretRef.JoinPath("sm.aws")
 	case VaultTypeAzureKeyVault:
 		secretRef = secretRef.JoinPath("kv.azure")
+	case VaultTypeAzureKeyVaultChina:
+		secretRef = secretRef.JoinPath("kv.azure.cn")
+	case VaultTypeAzureKeyVaultUSGov:
+		secretRef = secretRef.JoinPath("kv.azure.us")
+	case VaultTypeAzureKeyVaultGermany:
+		secretRef = secretRef.JoinPath("kv.azure.de")
 	case VaultTypeGcpSecretsManager:
 		secretRef = secretRef.JoinPath("sm.gcp")
 	default:
@@ -117,8 +114,12 @@ func (sr *SecretReference) GetVaultAddress() string {
 		return "arn:aws:secretsmanager:" + sr.Region + ":" + sr.VaultProviderAddress + ":secret:" + sr.SecretName
 	case VaultTypeAzureKeyVault:
 		return "https://" + sr.VaultProviderAddress + ".vault.azure.net/secrets/" + sr.SecretName
-	case VaultTypeGcpSecretsManager:
-		return "projects/" + sr.VaultProviderAddress + "/secrets/" + sr.SecretName
+	case VaultTypeAzureKeyVaultChina:
+		return "https://" + sr.VaultProviderAddress + ".vault.azure.cn/secrets/" + sr.SecretName
+	case VaultTypeAzureKeyVaultUSGov:
+		return "https://" + sr.VaultProviderAddress + ".vault.usgovcloudapi.net/secrets/" + sr.SecretName
+	case VaultTypeAzureKeyVaultGermany:
+		return "https://" + sr.VaultProviderAddress + ".vault.microsoftazure.de/secrets/" + sr.SecretName
 	default:
 		return "Invalid vault type"
 	}

@@ -40,33 +40,25 @@ func ConvertAzureArnToRef(addr string) (string, error) {
 	usGovAzureDomain := regexp.MustCompile(`.*\.vault\.usgovcloudapi\.net`)
 	germanAzureDomain := regexp.MustCompile(`.*\.vault\.microsoftazure\.de`)
 
-	var vaultName string
-	var provider string
-	if vaultAddress == "localhost" {
-		vaultName = parsedUrl.Port()
-	} else {
-		switch {
-		case stdAzureDomain.MatchString(vaultAddress):
-			// Do nothing, standard vault address
-		case chinaAzureDomain.MatchString(vaultAddress):
-			provider = "cn"
-		case usGovAzureDomain.MatchString(vaultAddress):
-			provider = "usgov"
-		case germanAzureDomain.MatchString(vaultAddress):
-			provider = "de"
-		}
-		vaultName = strings.Split(vaultAddress, ".")[0]
+	var vaultType secretref.VaultType
+	switch {
+	case stdAzureDomain.MatchString(vaultAddress):
+		vaultType = secretref.VaultTypeAzureKeyVault
+	case chinaAzureDomain.MatchString(vaultAddress):
+		vaultType = secretref.VaultTypeAzureKeyVaultChina
+	case usGovAzureDomain.MatchString(vaultAddress):
+		vaultType = secretref.VaultTypeAzureKeyVaultUSGov
+	case germanAzureDomain.MatchString(vaultAddress):
+		vaultType = secretref.VaultTypeAzureKeyVaultGermany
+	default:
+		return "", fmt.Errorf("invalid Azure Key Vault URL: %s", vaultAddress)
 	}
+	vaultName := strings.Split(vaultAddress, ".")[0]
 
 	splitPath := strings.Split(parsedUrl.Path, "/")
 	secretName := splitPath[2]
 
-	secretRef := secretref.New(vaultName, secretref.VaultTypeAzureKeyVault, secretName)
-
-	// Add the provider to the secret reference if it exists
-	if provider != "" {
-		secretRef.SetProvider(provider)
-	}
+	secretRef := secretref.New(vaultName, vaultType, secretName)
 
 	// Extract the version from the URL if present
 	if len(splitPath) > 3 {

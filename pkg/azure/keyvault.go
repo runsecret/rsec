@@ -8,6 +8,7 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/Azure/azure-sdk-for-go/sdk/keyvault/azsecrets"
+	"github.com/runsecret/rsec/pkg/secretref"
 )
 
 // Define the interface to match the Azure Key Vault client methods
@@ -30,7 +31,6 @@ func getBaseURL(fullURL string) (string, error) {
 	}
 
 	baseURL := fmt.Sprintf("%s://%s", parsedURL.Scheme, parsedURL.Host)
-	fmt.Printf("Base URL: %s\n", baseURL)
 	return baseURL, nil
 }
 
@@ -60,10 +60,10 @@ func (k *KeyVault) getClient(vaultAddress string) KeyVaultClientAPI {
 }
 
 // Ex: https://myvaultname.vault.azure.net/secrets/mysecretname/version123
-func (k KeyVault) GetSecret(vaultAddress string) (string, error) {
+func (k KeyVault) GetSecret(ref secretref.SecretReference) (string, error) {
 	// Call the GetSecretValue API
 	version := "" // An empty string version gets the latest version of the secret.
-	resp, err := k.getClient(vaultAddress).GetSecret(context.TODO(), vaultAddress, version, nil)
+	resp, err := k.getClient(ref.GetVaultAddress()).GetSecret(context.TODO(), ref.SecretName, version, nil)
 	if err != nil {
 		return "", err
 	}

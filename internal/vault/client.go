@@ -34,7 +34,7 @@ func (c Client) GetSecret(secretID string) (secret string, err error) {
 		if c.azureClient == nil {
 			c.azureClient = azure.NewKeyVault()
 		}
-		secret, err = c.azureClient.GetSecret(secretRef.GetVaultAddress())
+		secret, err = c.azureClient.GetSecret(secretRef)
 	default:
 		return "", errors.New("secret vault type unsupported")
 	}
@@ -43,8 +43,8 @@ func (c Client) GetSecret(secretID string) (secret string, err error) {
 }
 
 func GetIdentifierType(secretID string) SecretIdentifierType {
-	awsArnRegex := regexp.MustCompile(`arn:aws.*`)                                                                                                                         // Ex: arn:aws:secretsmanager:us-west-2:123456789012:secret:my-secret
-	azureAddrRegex := regexp.MustCompile(`^https:\/\/(?:(?:[^\/]+\.vault\.(azure\.(net|cn)|usgovcloudapi\.net|microsoftazure\.de))|localhost(?::\d+)?)\/secrets\/.*?\/?$`) // Ex: https://myvaultname.vault.azure.net/secrets/mysecretname/
+	awsArnRegex := regexp.MustCompile(`arn:aws.*`)                                                                                                      // Ex: arn:aws:secretsmanager:us-west-2:123456789012:secret:my-secret
+	azureAddrRegex := regexp.MustCompile(`^https:\/\/(?:(?:[^\/]+\.vault\.(azure\.(net|cn)|usgovcloudapi\.net|microsoftazure\.de)))\/secrets\/.*?\/?$`) // Ex: https://myvaultname.vault.azure.net/secrets/mysecretname/
 
 	switch {
 	case secretref.IsSecretRef(secretID):

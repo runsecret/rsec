@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/keyvault/azsecrets"
+	"github.com/runsecret/rsec/pkg/secretref"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -38,8 +39,11 @@ func TestSecretsManager_GetSecret(t *testing.T) {
 		},
 	}, nil)
 
+	// Create a secret reference
+	secretRef := secretref.New("vault", secretref.VaultTypeAzureKeyVault, secretID)
+
 	// Call the method
-	secret, err := service.GetSecret(secretID)
+	secret, err := service.GetSecret(secretRef)
 	require.NoError(t, err)
 	assert.Equal(t, expectedSecret, secret)
 
