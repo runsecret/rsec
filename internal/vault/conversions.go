@@ -25,16 +25,16 @@ func ConvertAwsArnToRef(arn string) string {
 func ConvertAzureArnToRef(addr string) (string, error) {
 	// From: https://{vaultName}.vault.azure.net/secrets/{secretName}/{version}
 	// To: rsec://myvaultname/kv.azure/mysecretname?version={version}&provider={provider}
-	parsedUrl, err := url.Parse(addr)
+	parsedURL, err := url.Parse(addr)
 	if err != nil {
 		return "", err
 	}
-	if parsedUrl.Scheme != "https" {
-		return "", fmt.Errorf("invalid URL scheme, azure keyvault urls must be https: %s", parsedUrl.Scheme)
+	if parsedURL.Scheme != "https" {
+		return "", fmt.Errorf("invalid URL scheme, azure keyvault urls must be https: %s", parsedURL.Scheme)
 	}
 
 	// Extract the vault name and secret name from the URL
-	vaultAddress := parsedUrl.Hostname()
+	vaultAddress := parsedURL.Hostname()
 	stdAzureDomain := regexp.MustCompile(`.*\.vault\.azure\.net`)
 	chinaAzureDomain := regexp.MustCompile(`.*\.vault\.azure\.cn`)
 	usGovAzureDomain := regexp.MustCompile(`.*\.vault\.usgovcloudapi\.net`)
@@ -55,7 +55,7 @@ func ConvertAzureArnToRef(addr string) (string, error) {
 	}
 	vaultName := strings.Split(vaultAddress, ".")[0]
 
-	splitPath := strings.Split(parsedUrl.Path, "/")
+	splitPath := strings.Split(parsedURL.Path, "/")
 	secretName := splitPath[2]
 
 	secretRef := secretref.New(vaultName, vaultType, secretName)
