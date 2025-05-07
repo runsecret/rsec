@@ -20,10 +20,18 @@ func NewRefCmd() *cobra.Command {
 
 			var secretRef string
 			var vaultAddr string
+			var err error
 			switch vault.GetIdentifierType(secretID) {
 			case vault.SecretIdentifierTypeAwsArn:
 				vaultAddr = secretID
 				secretRef = vault.ConvertAwsArnToRef(secretID)
+			case vault.SecretIdentifierTypeAzureArn:
+				vaultAddr = secretID
+				secretRef, err = vault.ConvertAzureArnToRef(secretID)
+				if err != nil {
+					std.Err("❌ - Cannot parse secret reference ", err)
+					return
+				}
 			case vault.SecretIdentifierTypeRef:
 				secretReference, err := secretref.NewFromString(secretID)
 				if err != nil {
