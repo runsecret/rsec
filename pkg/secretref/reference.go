@@ -88,8 +88,8 @@ func (sr *SecretReference) String() string {
 		secretRef = secretRef.JoinPath("kv.azure.us")
 	case VaultTypeAzureKeyVaultGermany:
 		secretRef = secretRef.JoinPath("kv.azure.de")
-	case VaultTypeGcpSecretsManager:
-		secretRef = secretRef.JoinPath("sm.gcp")
+	case VaultTypeHashicorpVault:
+		secretRef = secretRef.JoinPath("v.hashi")
 	default:
 		secretRef = secretRef.JoinPath("ERROR")
 	}

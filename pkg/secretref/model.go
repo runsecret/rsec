@@ -4,11 +4,11 @@ type VaultType int
 
 const (
 	VaultTypeAwsSecretsManager    VaultType = iota // AWS
-	VaultTypeGcpSecretsManager                     // GCP - TODO: Implement
 	VaultTypeAzureKeyVault                         // Azure
 	VaultTypeAzureKeyVaultChina                    // Azure China
 	VaultTypeAzureKeyVaultUSGov                    // Azure US Gov
 	VaultTypeAzureKeyVaultGermany                  // Azure Germany
+	VaultTypeHashicorpVault                        // HashiCorp Vault
 	VaultTypeUnknown                               // Unknown
 )
 
@@ -24,8 +24,8 @@ func vaultTypeFromString(vaultType string) VaultType {
 		return VaultTypeAzureKeyVaultUSGov
 	case "kv.azure.de":
 		return VaultTypeAzureKeyVaultGermany
-	case "sm.gcp":
-		return VaultTypeGcpSecretsManager
+	case "kv.hashi":
+		return VaultTypeHashicorpVault
 	default:
 		return VaultTypeUnknown
 	}
