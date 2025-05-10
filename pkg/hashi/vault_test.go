@@ -12,7 +12,7 @@ import (
 
 // Mock implementations
 type mockHashiKVClient struct {
-	mockData map[string]interface{}
+	mockData map[string]any
 	mockErr  error
 }
 
@@ -24,10 +24,10 @@ func (m *mockHashiKVClient) Get(ctx context.Context, path string) (*vault.KVSecr
 }
 
 type mockHashiVaultClientAPI struct {
-	mockKVClient HashiKVClient
+	mockKVClient KVClient
 }
 
-func (m *mockHashiVaultClientAPI) KVv2(mountpath string) HashiKVClient {
+func (m *mockHashiVaultClientAPI) KVv2(mountpath string) KVClient {
 	return m.mockKVClient
 }
 
@@ -38,7 +38,7 @@ func TestHashiVault_GetSecret_Success(t *testing.T) {
 	mockKVClient := &mockHashiKVClient{mockData: mockData, mockErr: nil}
 	mockVaultClient := &mockHashiVaultClientAPI{mockKVClient: mockKVClient}
 
-	hv := &HashiVault{client: mockVaultClient}
+	hv := &Vault{client: mockVaultClient}
 
 	secret, err := hv.GetSecret("http://localhost:8200", "secret/my-project")
 	require.NoError(t, err)
@@ -49,7 +49,7 @@ func TestHashiVault_GetSecret_ErrorFetchingSecret(t *testing.T) {
 	mockKVClient := &mockHashiKVClient{mockData: nil, mockErr: errors.New("failed to fetch secret")}
 	mockVaultClient := &mockHashiVaultClientAPI{mockKVClient: mockKVClient}
 
-	hv := &HashiVault{client: mockVaultClient}
+	hv := &Vault{client: mockVaultClient}
 
 	_, err := hv.GetSecret("http://localhost:8200", "secret/my-project")
 	require.Error(t, err)
@@ -63,7 +63,7 @@ func TestHashiVault_GetSecret_InvalidDataType(t *testing.T) {
 	mockKVClient := &mockHashiKVClient{mockData: mockData, mockErr: nil}
 	mockVaultClient := &mockHashiVaultClientAPI{mockKVClient: mockKVClient}
 
-	hv := &HashiVault{client: mockVaultClient}
+	hv := &Vault{client: mockVaultClient}
 	_, err := hv.GetSecret("http://localhost:8200", "secret/my-project")
 	require.Error(t, err)
 	assert.Equal(t, "value type assertion failed: int 12345", err.Error())

@@ -8,31 +8,31 @@ import (
 	vault "github.com/hashicorp/vault/api"
 )
 
-type HashiKVClient interface {
+type KVClient interface {
 	Get(ctx context.Context, path string) (*vault.KVSecret, error)
 }
 
-type HashiVaultClientAPI interface {
-	KVv2(mountpath string) HashiKVClient
+type VaultClientAPI interface {
+	KVv2(mountpath string) KVClient
 }
 
 type vaultClientWrapper struct {
 	client *vault.Client
 }
 
-func (v *vaultClientWrapper) KVv2(mountpath string) HashiKVClient {
+func (v *vaultClientWrapper) KVv2(mountpath string) KVClient {
 	return v.client.KVv2(mountpath)
 }
 
-type HashiVault struct {
-	client HashiVaultClientAPI
+type Vault struct {
+	client VaultClientAPI
 }
 
-func NewHashiVault() *HashiVault {
-	return &HashiVault{}
+func NewVault() *Vault {
+	return &Vault{}
 }
 
-func (h *HashiVault) getClient(vaultAddress string) HashiVaultClientAPI {
+func (h *Vault) getClient(vaultAddress string) VaultClientAPI {
 	// Create client if not already created
 	if h.client == nil {
 		client, err := vault.NewClient(vault.DefaultConfig())
@@ -50,7 +50,7 @@ func (h *HashiVault) getClient(vaultAddress string) HashiVaultClientAPI {
 	return h.client
 }
 
-func (h *HashiVault) GetSecret(vaultAddress string, secretPath string) (string, error) {
+func (h *Vault) GetSecret(vaultAddress string, secretPath string) (string, error) {
 	client := h.getClient(vaultAddress)
 
 	// Get the secret from the vault
