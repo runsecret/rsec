@@ -3,6 +3,7 @@ package hashi
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 	"os"
 
@@ -14,21 +15,14 @@ type KVClient interface {
 	Get(ctx context.Context, path string) (*vault.KVSecret, error)
 }
 
+type LogicalClient interface {
+	Read(path string) (*vault.Secret, error)
+}
+
 type VaultClientAPI interface {
 	KVv1(mountpath string) KVClient
 	KVv2(mountpath string) KVClient
-}
-
-type vaultClientWrapper struct {
-	client *vault.Client
-}
-
-func (v *vaultClientWrapper) KVv1(mountpath string) KVClient {
-	return v.client.KVv1(mountpath)
-}
-
-func (v *vaultClientWrapper) KVv2(mountpath string) KVClient {
-	return v.client.KVv2(mountpath)
+	Logical() LogicalClient
 }
 
 type Vault struct {
@@ -86,23 +80,25 @@ func (h *Vault) GetKv1Secret(ref secretref.SecretReference) (string, error) {
 	return secretJsonString, nil
 }
 
-// 	client := h.getClient()
+func (h *Vault) GetCredential(ref secretref.SecretReference) (string, error) {
+	client := h.getClient()
 
-// 	// Get the secret from the vault
-// 	secret, err := client.Logical().Read(ref.SecretName)
-// 	if err != nil {
-// 		return "", err
-// 	}
+	// Get the secret from the vault
+	secretPath := fmt.Sprintf("%s/creds/%s", ref.VaultProviderAddress, ref.SecretName)
+	secret, err := client.Logical().Read(secretPath)
+	if err != nil {
+		return "", err
+	}
 
-// 	// Convert secret map to JSON string
-// 	jsonBytes, err := json.Marshal(secret.Data)
-// 	if err != nil {
-// 		return "", err
-// 	}
-// 	secretJsonString := string(jsonBytes)
+	// Convert secret map to JSON string
+	jsonBytes, err := json.Marshal(secret.Data)
+	if err != nil {
+		return "", err
+	}
+	secretJsonString := string(jsonBytes)
 
-// 	return secretJsonString, nil
-// }
+	return secretJsonString, nil
+}
 
 // GetKv2Secret retrieves a secret from HashiCorp Vault using the KV v2 API
 func (h *Vault) GetKv2Secret(ref secretref.SecretReference) (string, error) {

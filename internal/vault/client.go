@@ -47,6 +47,11 @@ func (c Client) GetSecret(secretID string) (secret string, err error) {
 			c.hashiClient = hashi.NewVault()
 		}
 		secret, err = c.hashiClient.GetKv2Secret(secretRef)
+	case secretref.VaultTypeHashicorpVaultCred:
+		if c.hashiClient == nil {
+			c.hashiClient = hashi.NewVault()
+		}
+		secret, err = c.hashiClient.GetCredential(secretRef)
 	default:
 		return "", errors.New("secret vault type unsupported")
 	}

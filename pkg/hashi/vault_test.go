@@ -1,40 +1,13 @@
 package hashi
 
 import (
-	"context"
 	"errors"
 	"testing"
 
-	vault "github.com/hashicorp/vault/api"
 	"github.com/runsecret/rsec/pkg/secretref"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
-
-// Mock implementations
-type mockHashiKVClient struct {
-	mockData map[string]any
-	mockErr  error
-}
-
-func (m *mockHashiKVClient) Get(ctx context.Context, path string) (*vault.KVSecret, error) {
-	if m.mockErr != nil {
-		return nil, m.mockErr
-	}
-	return &vault.KVSecret{Data: m.mockData}, nil
-}
-
-type mockHashiVaultClientAPI struct {
-	mockKVClient KVClient
-}
-
-func (m *mockHashiVaultClientAPI) KVv1(mountpath string) KVClient {
-	return m.mockKVClient
-}
-
-func (m *mockHashiVaultClientAPI) KVv2(mountpath string) KVClient {
-	return m.mockKVClient
-}
 
 func TestHashiVault_GetKv1Secret_Success(t *testing.T) {
 	mockData := map[string]interface{}{
@@ -94,6 +67,37 @@ func TestHashiVault_GetKv2Secret_ErrorFetchingSecret(t *testing.T) {
 	secretRef := secretref.New("vault", secretref.VaultTypeHashicorpVaultKv2, "secret/my-project")
 
 	_, err := hv.GetKv2Secret(secretRef)
+	require.Error(t, err)
+	assert.Equal(t, "failed to fetch secret", err.Error())
+}
+
+func TestHashiVault_GetCredentials_Success(t *testing.T) {
+	mockData := map[string]interface{}{
+		"username": "db_username",
+	}
+	mockLogicalClient := &mockHashiLogicalClient{mockData: mockData, mockErr: nil}
+	mockVaultClient := &mockHashiVaultClientAPI{mockLogicalClient: mockLogicalClient}
+
+	hv := &Vault{client: mockVaultClient}
+
+	// Setup secret reference
+	secretRef := secretref.New("vault", secretref.VaultTypeHashicorpVaultKv2, "secret/my-project")
+
+	secret, err := hv.GetCredential(secretRef)
+	require.NoError(t, err)
+	assert.Equal(t, "{\"username\":\"db_username\"}", secret)
+}
+
+func TestHashiVault_GetCredential_ErrorFetchingSecret(t *testing.T) {
+	mockLogicalClient := &mockHashiLogicalClient{mockData: nil, mockErr: errors.New("failed to fetch secret")}
+	mockVaultClient := &mockHashiVaultClientAPI{mockLogicalClient: mockLogicalClient}
+
+	hv := &Vault{client: mockVaultClient}
+
+	// Setup secret reference
+	secretRef := secretref.New("vault", secretref.VaultTypeHashicorpVaultKv2, "secret/my-project")
+
+	_, err := hv.GetCredential(secretRef)
 	require.Error(t, err)
 	assert.Equal(t, "failed to fetch secret", err.Error())
 }
