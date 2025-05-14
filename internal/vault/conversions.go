@@ -71,7 +71,7 @@ func ConvertAzureArnToRef(addr string) (string, error) {
 	return secretRef.String(), nil
 }
 
-func ConvertHashiCorpVaultToRef(addr string) (string, error) {
+func ConvertHashicorpVaultURLToRef(addr string) (string, error) {
 	// From: https://localhost:8200/v1/{mountPath}/{data|creds}/{secretName}
 	// To: rsec://{mountPath}/{kv|cred}.hashi/{secretName}
 	parsedURL, err := url.Parse(addr)

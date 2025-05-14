@@ -62,6 +62,7 @@ func (c Client) GetSecret(secretID string) (secret string, err error) {
 func GetIdentifierType(secretID string) SecretIdentifierType {
 	awsArnRegex := regexp.MustCompile(`arn:aws.*`)                                                                                                      // Ex: arn:aws:secretsmanager:us-west-2:123456789012:secret:my-secret
 	azureAddrRegex := regexp.MustCompile(`^https:\/\/(?:(?:[^\/]+\.vault\.(azure\.(net|cn)|usgovcloudapi\.net|microsoftazure\.de)))\/secrets\/.*?\/?$`) // Ex: https://myvaultname.vault.azure.net/secrets/mysecretname/
+	hashiURLRegex := regexp.MustCompile(`https?:\/\/(([-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6})|(localhost|(\d{1,3}\.){3}\d{1,3}))(:[0-9]{1,5})?\b([-a-zA-Z0-9()@:%_\+.~#?&\/=]*)\/v1\/[^\/]+\/(data|creds)\/.*`)
 
 	switch {
 	case secretref.IsSecretRef(secretID):
@@ -70,6 +71,8 @@ func GetIdentifierType(secretID string) SecretIdentifierType {
 		return SecretIdentifierTypeAwsArn
 	case azureAddrRegex.MatchString(secretID):
 		return SecretIdentifierTypeAzureArn
+	case hashiURLRegex.MatchString(secretID):
+		return SecretIdentifierTypeHashiURL
 	default:
 		return SecretIdentifierTypeUnknown
 	}

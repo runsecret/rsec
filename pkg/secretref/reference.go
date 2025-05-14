@@ -9,7 +9,7 @@ import (
 )
 
 func IsSecretRef(potentialSecret string) bool {
-	refRegex := regexp.MustCompile(`(rsec:\/\/)([-a-zA-Z0-9_\+~#=:]*)\/([a-z]*\.[a-z]*)\/([-a-zA-Z0-9()@:%_\+.~#?&\/\/=]*)`)
+	refRegex := regexp.MustCompile(`(rsec:\/\/)([-a-zA-Z0-9_\+~#=:]*)\/([a-z0-9]*\.[a-z]*)\/([-a-zA-Z0-9()@:%_\+.~#?&\/\/=]*)`)
 	return refRegex.MatchString(potentialSecret)
 }
 
