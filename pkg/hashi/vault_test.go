@@ -28,11 +28,15 @@ type mockHashiVaultClientAPI struct {
 	mockKVClient KVClient
 }
 
+func (m *mockHashiVaultClientAPI) KVv1(mountpath string) KVClient {
+	return m.mockKVClient
+}
+
 func (m *mockHashiVaultClientAPI) KVv2(mountpath string) KVClient {
 	return m.mockKVClient
 }
 
-func TestHashiVault_GetSecret_Success(t *testing.T) {
+func TestHashiVault_GetKv1Secret_Success(t *testing.T) {
 	mockData := map[string]interface{}{
 		"password": "test-password",
 	}
@@ -44,12 +48,12 @@ func TestHashiVault_GetSecret_Success(t *testing.T) {
 	// Setup secret reference
 	secretRef := secretref.New("vault", secretref.VaultTypeHashicorpVaultKv2, "secret/my-project")
 
-	secret, err := hv.GetSecret(secretRef)
+	secret, err := hv.GetKv1Secret(secretRef)
 	require.NoError(t, err)
 	assert.Equal(t, "{\"password\":\"test-password\"}", secret)
 }
 
-func TestHashiVault_GetSecret_ErrorFetchingSecret(t *testing.T) {
+func TestHashiVault_GetKv1Secret_ErrorFetchingSecret(t *testing.T) {
 	mockKVClient := &mockHashiKVClient{mockData: nil, mockErr: errors.New("failed to fetch secret")}
 	mockVaultClient := &mockHashiVaultClientAPI{mockKVClient: mockKVClient}
 
@@ -58,7 +62,38 @@ func TestHashiVault_GetSecret_ErrorFetchingSecret(t *testing.T) {
 	// Setup secret reference
 	secretRef := secretref.New("vault", secretref.VaultTypeHashicorpVaultKv2, "secret/my-project")
 
-	_, err := hv.GetSecret(secretRef)
+	_, err := hv.GetKv1Secret(secretRef)
+	require.Error(t, err)
+	assert.Equal(t, "failed to fetch secret", err.Error())
+}
+
+func TestHashiVault_GetKv2Secret_Success(t *testing.T) {
+	mockData := map[string]interface{}{
+		"password": "test-password",
+	}
+	mockKVClient := &mockHashiKVClient{mockData: mockData, mockErr: nil}
+	mockVaultClient := &mockHashiVaultClientAPI{mockKVClient: mockKVClient}
+
+	hv := &Vault{client: mockVaultClient}
+
+	// Setup secret reference
+	secretRef := secretref.New("vault", secretref.VaultTypeHashicorpVaultKv2, "secret/my-project")
+
+	secret, err := hv.GetKv2Secret(secretRef)
+	require.NoError(t, err)
+	assert.Equal(t, "{\"password\":\"test-password\"}", secret)
+}
+
+func TestHashiVault_GetKv2Secret_ErrorFetchingSecret(t *testing.T) {
+	mockKVClient := &mockHashiKVClient{mockData: nil, mockErr: errors.New("failed to fetch secret")}
+	mockVaultClient := &mockHashiVaultClientAPI{mockKVClient: mockKVClient}
+
+	hv := &Vault{client: mockVaultClient}
+
+	// Setup secret reference
+	secretRef := secretref.New("vault", secretref.VaultTypeHashicorpVaultKv2, "secret/my-project")
+
+	_, err := hv.GetKv2Secret(secretRef)
 	require.Error(t, err)
 	assert.Equal(t, "failed to fetch secret", err.Error())
 }

@@ -37,11 +37,16 @@ func (c Client) GetSecret(secretID string) (secret string, err error) {
 			c.azureClient = azure.NewKeyVault()
 		}
 		secret, err = c.azureClient.GetSecret(secretRef)
-	case secretref.VaultTypeHashicorpVaultKv1, secretref.VaultTypeHashicorpVaultKv2:
+	case secretref.VaultTypeHashicorpVaultKv1:
 		if c.hashiClient == nil {
 			c.hashiClient = hashi.NewVault()
 		}
-		secret, err = c.hashiClient.GetSecret(secretRef)
+		secret, err = c.hashiClient.GetKv1Secret(secretRef)
+	case secretref.VaultTypeHashicorpVaultKv2:
+		if c.hashiClient == nil {
+			c.hashiClient = hashi.NewVault()
+		}
+		secret, err = c.hashiClient.GetKv2Secret(secretRef)
 	default:
 		return "", errors.New("secret vault type unsupported")
 	}
