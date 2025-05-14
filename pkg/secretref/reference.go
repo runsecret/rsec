@@ -19,6 +19,7 @@ type SecretReference struct {
 	SecretName           string
 	Region               string
 	SecretVersion        string
+	Endpoint             string
 }
 
 func New(vaultProviderAddress string, vaultType VaultType, secretName string) SecretReference {
@@ -54,12 +55,16 @@ func NewFromString(secretRef string) (SecretReference, error) {
 	// Extract the secret version from the path if it exists
 	secretVersion := parsedURL.Query().Get("version")
 
+	// Extract the provider endpoint from the path if it exists
+	endpoint := parsedURL.Query().Get("endpoint")
+
 	return SecretReference{
 		VaultProviderAddress: vaultProviderAddress,
 		VaultType:            vaultTypeFromString(vaultType),
 		SecretName:           secretName,
 		Region:               region,
 		SecretVersion:        secretVersion,
+		Endpoint:             endpoint,
 	}, nil
 }
 
@@ -69,6 +74,10 @@ func (sr *SecretReference) SetSecretVersion(version string) {
 
 func (sr *SecretReference) SetRegion(region string) {
 	sr.Region = region
+}
+
+func (sr *SecretReference) SetEndpoint(endpoint string) {
+	sr.Endpoint = endpoint
 }
 
 func (sr *SecretReference) String() string {
@@ -103,12 +112,16 @@ func (sr *SecretReference) String() string {
 	// Add secretName to the path
 	secretRef = secretRef.JoinPath(sr.SecretName)
 
+	//Build query
+	secretRefQuery := secretRef.Query()
+
 	if sr.Region != "" {
-		secretRef.RawQuery = "region=" + sr.Region
+		secretRefQuery.Add("region", sr.Region)
 	}
-	if sr.SecretVersion != "" {
-		secretRef.Path += "?" + sr.SecretVersion
+	if sr.Endpoint != "" {
+		secretRefQuery.Add("endpoint", sr.Endpoint)
 	}
+	secretRef.RawQuery = secretRefQuery.Encode()
 
 	return secretRef.String()
 }
@@ -126,13 +139,22 @@ func (sr *SecretReference) GetVaultAddress() string {
 	case VaultTypeAzureKeyVaultGermany:
 		return "https://" + sr.VaultProviderAddress + ".vault.microsoftazure.de/secrets/" + sr.SecretName
 	case VaultTypeHashicorpVaultKv1:
-		vaultAddr := utils.GetEnv("VAULT_ADDR", "<VAULT_ADDR>")
+		vaultAddr := sr.Endpoint
+		if vaultAddr == "" {
+			vaultAddr = utils.GetEnv("VAULT_ADDR", "<VAULT_ADDR>")
+		}
 		return vaultAddr + "/v1/" + sr.VaultProviderAddress + "/" + sr.SecretName
 	case VaultTypeHashicorpVaultKv2:
-		vaultAddr := utils.GetEnv("VAULT_ADDR", "<VAULT_ADDR>")
+		vaultAddr := sr.Endpoint
+		if vaultAddr == "" {
+			vaultAddr = utils.GetEnv("VAULT_ADDR", "<VAULT_ADDR>")
+		}
 		return vaultAddr + "/v1/" + sr.VaultProviderAddress + "/data/" + sr.SecretName
 	case VaultTypeHashicorpVaultCred:
-		vaultAddr := utils.GetEnv("VAULT_ADDR", "<VAULT_ADDR>")
+		vaultAddr := sr.Endpoint
+		if vaultAddr == "" {
+			vaultAddr = utils.GetEnv("VAULT_ADDR", "<VAULT_ADDR>")
+		}
 		return vaultAddr + "/v1/" + sr.VaultProviderAddress + "/creds/" + sr.SecretName
 	default:
 		return "Invalid vault type"

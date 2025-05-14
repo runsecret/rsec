@@ -33,12 +33,15 @@ func NewVault() *Vault {
 	return &Vault{}
 }
 
-func (h *Vault) getClient() VaultClientAPI {
+func (h *Vault) getClient(ref secretref.SecretReference) VaultClientAPI {
 	// Create client if not already created
 	if h.client == nil {
 		// Setup config for HashiCorp Vault
 		config := vault.DefaultConfig()
-		vaultAddr := os.Getenv("VAULT_ADDR")
+		vaultAddr := ref.Endpoint
+		if vaultAddr == "" {
+			vaultAddr = os.Getenv("VAULT_ADDR")
+		}
 		if vaultAddr == "" {
 			log.Fatal("VAULT_ADDR environment variable is not set")
 		}
@@ -61,7 +64,7 @@ func (h *Vault) getClient() VaultClientAPI {
 }
 
 func (h *Vault) GetKv1Secret(ref secretref.SecretReference) (string, error) {
-	client := h.getClient()
+	client := h.getClient(ref)
 
 	// Get the secret from the vault
 	kvClient := client.KVv1(ref.VaultProviderAddress)
@@ -81,7 +84,7 @@ func (h *Vault) GetKv1Secret(ref secretref.SecretReference) (string, error) {
 }
 
 func (h *Vault) GetCredential(ref secretref.SecretReference) (string, error) {
-	client := h.getClient()
+	client := h.getClient(ref)
 
 	// Get the secret from the vault
 	secretPath := fmt.Sprintf("%s/creds/%s", ref.VaultProviderAddress, ref.SecretName)
@@ -102,7 +105,7 @@ func (h *Vault) GetCredential(ref secretref.SecretReference) (string, error) {
 
 // GetKv2Secret retrieves a secret from HashiCorp Vault using the KV v2 API
 func (h *Vault) GetKv2Secret(ref secretref.SecretReference) (string, error) {
-	client := h.getClient()
+	client := h.getClient(ref)
 
 	// Get the secret from the vault
 	kvClient := client.KVv2(ref.VaultProviderAddress)

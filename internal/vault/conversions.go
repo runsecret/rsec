@@ -80,7 +80,6 @@ func ConvertHashicorpVaultURLToRef(addr string) (string, error) {
 	}
 
 	// Extract the vault address and path
-	// vaultAddress := parsedURL.Host
 	vaultPath := parsedURL.Path
 	// Remove v1 from the path if present
 	if strings.HasPrefix(vaultPath, "/v1/") {
@@ -108,6 +107,8 @@ func ConvertHashicorpVaultURLToRef(addr string) (string, error) {
 
 	// Create the secret reference
 	secretRef := secretref.New(mountPath, vaultType, secretName)
+
+	secretRef.SetEndpoint(fmt.Sprintf("%s://%s", parsedURL.Scheme, parsedURL.Host))
 
 	return secretRef.String(), nil
 }
