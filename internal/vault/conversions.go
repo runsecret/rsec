@@ -82,9 +82,7 @@ func ConvertHashicorpVaultURLToRef(addr string) (string, error) {
 	// Extract the vault address and path
 	vaultPath := parsedURL.Path
 	// Remove v1 from the path if present
-	if strings.HasPrefix(vaultPath, "/v1/") {
-		vaultPath = strings.TrimPrefix(vaultPath, "/v1/")
-	}
+	vaultPath = strings.TrimPrefix(vaultPath, "/v1/")
 
 	pathSegments := strings.Split(vaultPath, "/")
 	// Split the path on "data" or "creds"

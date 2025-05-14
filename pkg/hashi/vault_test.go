@@ -23,7 +23,7 @@ func TestHashiVault_GetKv1Secret_Success(t *testing.T) {
 
 	secret, err := hv.GetKv1Secret(secretRef)
 	require.NoError(t, err)
-	assert.Equal(t, "{\"password\":\"test-password\"}", secret)
+	assert.JSONEq(t, "{\"password\":\"test-password\"}", secret)
 }
 
 func TestHashiVault_GetKv1Secret_ErrorFetchingSecret(t *testing.T) {
@@ -54,7 +54,7 @@ func TestHashiVault_GetKv2Secret_Success(t *testing.T) {
 
 	secret, err := hv.GetKv2Secret(secretRef)
 	require.NoError(t, err)
-	assert.Equal(t, "{\"password\":\"test-password\"}", secret)
+	assert.JSONEq(t, "{\"password\":\"test-password\"}", secret)
 }
 
 func TestHashiVault_GetKv2Secret_ErrorFetchingSecret(t *testing.T) {
@@ -85,7 +85,7 @@ func TestHashiVault_GetCredentials_Success(t *testing.T) {
 
 	secret, err := hv.GetCredential(secretRef)
 	require.NoError(t, err)
-	assert.Equal(t, "{\"username\":\"db_username\"}", secret)
+	assert.JSONEq(t, "{\"username\":\"db_username\"}", secret)
 }
 
 func TestHashiVault_GetCredential_ErrorFetchingSecret(t *testing.T) {

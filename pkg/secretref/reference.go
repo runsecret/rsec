@@ -112,7 +112,7 @@ func (sr *SecretReference) String() string {
 	// Add secretName to the path
 	secretRef = secretRef.JoinPath(sr.SecretName)
 
-	//Build query
+	// Build query
 	secretRefQuery := secretRef.Query()
 
 	if sr.Region != "" {

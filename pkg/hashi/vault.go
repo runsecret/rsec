@@ -78,9 +78,9 @@ func (h *Vault) GetKv1Secret(ref secretref.SecretReference) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	secretJsonString := string(jsonBytes)
+	secretJSONString := string(jsonBytes)
 
-	return secretJsonString, nil
+	return secretJSONString, nil
 }
 
 func (h *Vault) GetCredential(ref secretref.SecretReference) (string, error) {
@@ -98,9 +98,9 @@ func (h *Vault) GetCredential(ref secretref.SecretReference) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	secretJsonString := string(jsonBytes)
+	secretJSONString := string(jsonBytes)
 
-	return secretJsonString, nil
+	return secretJSONString, nil
 }
 
 // GetKv2Secret retrieves a secret from HashiCorp Vault using the KV v2 API
@@ -119,7 +119,7 @@ func (h *Vault) GetKv2Secret(ref secretref.SecretReference) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	secretJsonString := string(jsonBytes)
+	secretJSONString := string(jsonBytes)
 
-	return secretJsonString, nil
+	return secretJSONString, nil
 }
