@@ -8,7 +8,9 @@ const (
 	VaultTypeAzureKeyVaultChina                    // Azure China
 	VaultTypeAzureKeyVaultUSGov                    // Azure US Gov
 	VaultTypeAzureKeyVaultGermany                  // Azure Germany
-	VaultTypeHashicorpVault                        // HashiCorp Vault
+	VaultTypeHashicorpVaultKv1                     // HashiCorp Kv1 Vault Engine Secret
+	VaultTypeHashicorpVaultKv2                     // HashiCorp Kv2 Vault Engine Secret
+	VaultTypeHashicorpVaultCred                    // HashiCorp Vault Credential Secret
 	VaultTypeUnknown                               // Unknown
 )
 
@@ -24,8 +26,12 @@ func vaultTypeFromString(vaultType string) VaultType {
 		return VaultTypeAzureKeyVaultUSGov
 	case "kv.azure.de":
 		return VaultTypeAzureKeyVaultGermany
-	case "kv.hashi":
-		return VaultTypeHashicorpVault
+	case "kv1.hashi":
+		return VaultTypeHashicorpVaultKv1
+	case "kv2.hashi":
+		return VaultTypeHashicorpVaultKv2
+	case "cred.hashi":
+		return VaultTypeHashicorpVaultCred
 	default:
 		return VaultTypeUnknown
 	}

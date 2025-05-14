@@ -4,6 +4,8 @@ import (
 	"net/url"
 	"regexp"
 	"strings"
+
+	"github.com/runsecret/rsec/pkg/utils"
 )
 
 func IsSecretRef(potentialSecret string) bool {
@@ -88,8 +90,12 @@ func (sr *SecretReference) String() string {
 		secretRef = secretRef.JoinPath("kv.azure.us")
 	case VaultTypeAzureKeyVaultGermany:
 		secretRef = secretRef.JoinPath("kv.azure.de")
-	case VaultTypeHashicorpVault:
-		secretRef = secretRef.JoinPath("v.hashi")
+	case VaultTypeHashicorpVaultKv1:
+		secretRef = secretRef.JoinPath("kv1.hashi")
+	case VaultTypeHashicorpVaultKv2:
+		secretRef = secretRef.JoinPath("kv2.hashi")
+	case VaultTypeHashicorpVaultCred:
+		secretRef = secretRef.JoinPath("cred.hashi")
 	default:
 		secretRef = secretRef.JoinPath("ERROR")
 	}
@@ -108,7 +114,6 @@ func (sr *SecretReference) String() string {
 }
 
 func (sr *SecretReference) GetVaultAddress() string {
-	// Example: arn:aws:secretsmanager:us-west-2:123456789012:secret:my-secret
 	switch sr.VaultType {
 	case VaultTypeAwsSecretsManager:
 		return "arn:aws:secretsmanager:" + sr.Region + ":" + sr.VaultProviderAddress + ":secret:" + sr.SecretName
@@ -120,6 +125,15 @@ func (sr *SecretReference) GetVaultAddress() string {
 		return "https://" + sr.VaultProviderAddress + ".vault.usgovcloudapi.net/secrets/" + sr.SecretName
 	case VaultTypeAzureKeyVaultGermany:
 		return "https://" + sr.VaultProviderAddress + ".vault.microsoftazure.de/secrets/" + sr.SecretName
+	case VaultTypeHashicorpVaultKv1:
+		vaultAddr := utils.GetEnv("VAULT_ADDR", "<VAULT_ADDR>")
+		return vaultAddr + "/v1/" + sr.VaultProviderAddress + "/" + sr.SecretName
+	case VaultTypeHashicorpVaultKv2:
+		vaultAddr := utils.GetEnv("VAULT_ADDR", "<VAULT_ADDR>")
+		return vaultAddr + "/v1/" + sr.VaultProviderAddress + "/data/" + sr.SecretName
+	case VaultTypeHashicorpVaultCred:
+		vaultAddr := utils.GetEnv("VAULT_ADDR", "<VAULT_ADDR>")
+		return vaultAddr + "/v1/" + sr.VaultProviderAddress + "/creds/" + sr.SecretName
 	default:
 		return "Invalid vault type"
 	}
