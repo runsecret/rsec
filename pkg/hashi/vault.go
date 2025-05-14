@@ -2,10 +2,12 @@ package hashi
 
 import (
 	"context"
-	"fmt"
+	"encoding/json"
 	"log"
+	"os"
 
 	vault "github.com/hashicorp/vault/api"
+	"github.com/runsecret/rsec/pkg/secretref"
 )
 
 type KVClient interface {
@@ -32,10 +34,19 @@ func NewVault() *Vault {
 	return &Vault{}
 }
 
-func (h *Vault) getClient(vaultAddress string) VaultClientAPI {
+func (h *Vault) getClient() VaultClientAPI {
 	// Create client if not already created
 	if h.client == nil {
-		client, err := vault.NewClient(vault.DefaultConfig())
+		// Setup config for HashiCorp Vault
+		config := vault.DefaultConfig()
+		vaultAddr := os.Getenv("VAULT_ADDR")
+		if vaultAddr == "" {
+			log.Fatal("VAULT_ADDR environment variable is not set")
+		}
+		config.Address = vaultAddr
+
+		// Create a new Vault client
+		client, err := vault.NewClient(config)
 		if err != nil {
 			log.Fatalf("Cannot connect to HashiCorp Vault client: %s", err)
 		}
@@ -50,20 +61,22 @@ func (h *Vault) getClient(vaultAddress string) VaultClientAPI {
 	return h.client
 }
 
-func (h *Vault) GetSecret(vaultAddress string, secretPath string) (string, error) {
-	client := h.getClient(vaultAddress)
+func (h *Vault) GetSecret(ref secretref.SecretReference) (string, error) {
+	client := h.getClient()
 
 	// Get the secret from the vault
-	kvClient := client.KVv2("secret")
-	secret, err := kvClient.Get(context.Background(), "my-project")
+	kvClient := client.KVv2(ref.VaultProviderAddress)
+	secret, err := kvClient.Get(context.Background(), ref.SecretName)
 	if err != nil {
 		return "", err
 	}
 
-	value, ok := secret.Data["password"].(string)
-	if !ok {
-		return "", fmt.Errorf("value type assertion failed: %T %#v", secret.Data["password"], secret.Data["password"])
+	// Convert secret map to JSON string
+	jsonBytes, err := json.Marshal(secret.Data)
+	if err != nil {
+		return "", err
 	}
+	secretJsonString := string(jsonBytes)
 
-	return value, nil
+	return secretJsonString, nil
 }

@@ -6,12 +6,14 @@ import (
 
 	"github.com/runsecret/rsec/pkg/aws"
 	"github.com/runsecret/rsec/pkg/azure"
+	"github.com/runsecret/rsec/pkg/hashi"
 	"github.com/runsecret/rsec/pkg/secretref"
 )
 
 type Client struct {
 	awsClient   *aws.SecretsManager
 	azureClient *azure.KeyVault
+	hashiClient *hashi.Vault
 }
 
 func NewClient() Client {
@@ -35,6 +37,11 @@ func (c Client) GetSecret(secretID string) (secret string, err error) {
 			c.azureClient = azure.NewKeyVault()
 		}
 		secret, err = c.azureClient.GetSecret(secretRef)
+	case secretref.VaultTypeHashicorpVaultKv1, secretref.VaultTypeHashicorpVaultKv2:
+		if c.hashiClient == nil {
+			c.hashiClient = hashi.NewVault()
+		}
+		secret, err = c.hashiClient.GetSecret(secretRef)
 	default:
 		return "", errors.New("secret vault type unsupported")
 	}

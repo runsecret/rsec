@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	vault "github.com/hashicorp/vault/api"
+	"github.com/runsecret/rsec/pkg/secretref"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -40,9 +41,12 @@ func TestHashiVault_GetSecret_Success(t *testing.T) {
 
 	hv := &Vault{client: mockVaultClient}
 
-	secret, err := hv.GetSecret("http://localhost:8200", "secret/my-project")
+	// Setup secret reference
+	secretRef := secretref.New("vault", secretref.VaultTypeHashicorpVaultKv2, "secret/my-project")
+
+	secret, err := hv.GetSecret(secretRef)
 	require.NoError(t, err)
-	assert.Equal(t, "test-password", secret)
+	assert.Equal(t, "{\"password\":\"test-password\"}", secret)
 }
 
 func TestHashiVault_GetSecret_ErrorFetchingSecret(t *testing.T) {
@@ -51,20 +55,10 @@ func TestHashiVault_GetSecret_ErrorFetchingSecret(t *testing.T) {
 
 	hv := &Vault{client: mockVaultClient}
 
-	_, err := hv.GetSecret("http://localhost:8200", "secret/my-project")
+	// Setup secret reference
+	secretRef := secretref.New("vault", secretref.VaultTypeHashicorpVaultKv2, "secret/my-project")
+
+	_, err := hv.GetSecret(secretRef)
 	require.Error(t, err)
 	assert.Equal(t, "failed to fetch secret", err.Error())
-}
-
-func TestHashiVault_GetSecret_InvalidDataType(t *testing.T) {
-	mockData := map[string]interface{}{
-		"password": 12345, // Invalid type
-	}
-	mockKVClient := &mockHashiKVClient{mockData: mockData, mockErr: nil}
-	mockVaultClient := &mockHashiVaultClientAPI{mockKVClient: mockKVClient}
-
-	hv := &Vault{client: mockVaultClient}
-	_, err := hv.GetSecret("http://localhost:8200", "secret/my-project")
-	require.Error(t, err)
-	assert.Equal(t, "value type assertion failed: int 12345", err.Error())
 }
