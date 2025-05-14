@@ -1,3 +1,4 @@
+sleep 2
 curl \
     --header "X-Vault-Token: dev-only-token" \
     --request POST \
