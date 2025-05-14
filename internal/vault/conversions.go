@@ -70,3 +70,43 @@ func ConvertAzureArnToRef(addr string) (string, error) {
 
 	return secretRef.String(), nil
 }
+
+func ConvertHashicorpVaultURLToRef(addr string) (string, error) {
+	// From: https://localhost:8200/v1/{mountPath}/{data|creds}/{secretName}
+	// To: rsec://{mountPath}/{kv|cred}.hashi/{secretName}
+	parsedURL, err := url.Parse(addr)
+	if err != nil {
+		return "", err
+	}
+
+	// Extract the vault address and path
+	vaultPath := parsedURL.Path
+	// Remove v1 from the path if present
+	vaultPath = strings.TrimPrefix(vaultPath, "/v1/")
+
+	pathSegments := strings.Split(vaultPath, "/")
+	// Split the path on "data" or "creds"
+	var mountPath string
+	var secretName string
+	var vaultType secretref.VaultType
+	for i, segment := range pathSegments {
+		if segment == "data" || segment == "creds" {
+			switch segment {
+			case "data":
+				vaultType = secretref.VaultTypeHashicorpVaultKv2
+			case "creds":
+				vaultType = secretref.VaultTypeHashicorpVaultCred
+			}
+			mountPath = pathSegments[i-1]
+			secretName = pathSegments[i+1]
+			break
+		}
+	}
+
+	// Create the secret reference
+	secretRef := secretref.New(mountPath, vaultType, secretName)
+
+	secretRef.SetEndpoint(fmt.Sprintf("%s://%s", parsedURL.Scheme, parsedURL.Host))
+
+	return secretRef.String(), nil
+}

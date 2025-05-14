@@ -4,10 +4,12 @@ import (
 	"net/url"
 	"regexp"
 	"strings"
+
+	"github.com/runsecret/rsec/pkg/utils"
 )
 
 func IsSecretRef(potentialSecret string) bool {
-	refRegex := regexp.MustCompile(`(rsec:\/\/)([-a-zA-Z0-9_\+~#=:]*)\/([a-z]*\.[a-z]*)\/([-a-zA-Z0-9()@:%_\+.~#?&\/\/=]*)`)
+	refRegex := regexp.MustCompile(`(rsec:\/\/)([-a-zA-Z0-9_\+~#=:]*)\/([a-z0-9]*\.[a-z]*)\/([-a-zA-Z0-9()@:%_\+.~#?&\/\/=]*)`)
 	return refRegex.MatchString(potentialSecret)
 }
 
@@ -17,6 +19,7 @@ type SecretReference struct {
 	SecretName           string
 	Region               string
 	SecretVersion        string
+	Endpoint             string
 }
 
 func New(vaultProviderAddress string, vaultType VaultType, secretName string) SecretReference {
@@ -52,12 +55,16 @@ func NewFromString(secretRef string) (SecretReference, error) {
 	// Extract the secret version from the path if it exists
 	secretVersion := parsedURL.Query().Get("version")
 
+	// Extract the provider endpoint from the path if it exists
+	endpoint := parsedURL.Query().Get("endpoint")
+
 	return SecretReference{
 		VaultProviderAddress: vaultProviderAddress,
 		VaultType:            vaultTypeFromString(vaultType),
 		SecretName:           secretName,
 		Region:               region,
 		SecretVersion:        secretVersion,
+		Endpoint:             endpoint,
 	}, nil
 }
 
@@ -67,6 +74,10 @@ func (sr *SecretReference) SetSecretVersion(version string) {
 
 func (sr *SecretReference) SetRegion(region string) {
 	sr.Region = region
+}
+
+func (sr *SecretReference) SetEndpoint(endpoint string) {
+	sr.Endpoint = endpoint
 }
 
 func (sr *SecretReference) String() string {
@@ -88,8 +99,12 @@ func (sr *SecretReference) String() string {
 		secretRef = secretRef.JoinPath("kv.azure.us")
 	case VaultTypeAzureKeyVaultGermany:
 		secretRef = secretRef.JoinPath("kv.azure.de")
-	case VaultTypeGcpSecretsManager:
-		secretRef = secretRef.JoinPath("sm.gcp")
+	case VaultTypeHashicorpVaultKv1:
+		secretRef = secretRef.JoinPath("kv1.hashi")
+	case VaultTypeHashicorpVaultKv2:
+		secretRef = secretRef.JoinPath("kv2.hashi")
+	case VaultTypeHashicorpVaultCred:
+		secretRef = secretRef.JoinPath("cred.hashi")
 	default:
 		secretRef = secretRef.JoinPath("ERROR")
 	}
@@ -97,18 +112,21 @@ func (sr *SecretReference) String() string {
 	// Add secretName to the path
 	secretRef = secretRef.JoinPath(sr.SecretName)
 
+	// Build query
+	secretRefQuery := secretRef.Query()
+
 	if sr.Region != "" {
-		secretRef.RawQuery = "region=" + sr.Region
+		secretRefQuery.Add("region", sr.Region)
 	}
-	if sr.SecretVersion != "" {
-		secretRef.Path += "?" + sr.SecretVersion
+	if sr.Endpoint != "" {
+		secretRefQuery.Add("endpoint", sr.Endpoint)
 	}
+	secretRef.RawQuery = secretRefQuery.Encode()
 
 	return secretRef.String()
 }
 
 func (sr *SecretReference) GetVaultAddress() string {
-	// Example: arn:aws:secretsmanager:us-west-2:123456789012:secret:my-secret
 	switch sr.VaultType {
 	case VaultTypeAwsSecretsManager:
 		return "arn:aws:secretsmanager:" + sr.Region + ":" + sr.VaultProviderAddress + ":secret:" + sr.SecretName
@@ -120,6 +138,24 @@ func (sr *SecretReference) GetVaultAddress() string {
 		return "https://" + sr.VaultProviderAddress + ".vault.usgovcloudapi.net/secrets/" + sr.SecretName
 	case VaultTypeAzureKeyVaultGermany:
 		return "https://" + sr.VaultProviderAddress + ".vault.microsoftazure.de/secrets/" + sr.SecretName
+	case VaultTypeHashicorpVaultKv1:
+		vaultAddr := sr.Endpoint
+		if vaultAddr == "" {
+			vaultAddr = utils.GetEnv("VAULT_ADDR", "<VAULT_ADDR>")
+		}
+		return vaultAddr + "/v1/" + sr.VaultProviderAddress + "/" + sr.SecretName
+	case VaultTypeHashicorpVaultKv2:
+		vaultAddr := sr.Endpoint
+		if vaultAddr == "" {
+			vaultAddr = utils.GetEnv("VAULT_ADDR", "<VAULT_ADDR>")
+		}
+		return vaultAddr + "/v1/" + sr.VaultProviderAddress + "/data/" + sr.SecretName
+	case VaultTypeHashicorpVaultCred:
+		vaultAddr := sr.Endpoint
+		if vaultAddr == "" {
+			vaultAddr = utils.GetEnv("VAULT_ADDR", "<VAULT_ADDR>")
+		}
+		return vaultAddr + "/v1/" + sr.VaultProviderAddress + "/creds/" + sr.SecretName
 	default:
 		return "Invalid vault type"
 	}

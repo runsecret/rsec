@@ -29,7 +29,14 @@ func NewRefCmd() *cobra.Command {
 				vaultAddr = secretID
 				secretRef, err = vault.ConvertAzureArnToRef(secretID)
 				if err != nil {
-					std.Err("❌ - Cannot parse secret reference ", err)
+					std.Err("❌ - Cannot parse azure address ", err)
+					return
+				}
+			case vault.SecretIdentifierTypeHashiURL:
+				vaultAddr = secretID
+				secretRef, err = vault.ConvertHashicorpVaultURLToRef(secretID)
+				if err != nil {
+					std.Err("❌ - Cannot parse hashicorp URL ", err)
 					return
 				}
 			case vault.SecretIdentifierTypeRef:
