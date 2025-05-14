@@ -50,7 +50,7 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       - name: Start integration test containers
-        run: docker compose up -d --build
+        run: docker compose up -d --build --wait
       - name: Run Tests
         uses: magefile/mage-action@v3
         with:
