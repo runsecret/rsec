@@ -18,6 +18,7 @@ func TestCopyCommand(t *testing.T) {
 	// Capture output
 	b := bytes.NewBufferString("")
 	cmd.SetOut(b)
+	cmd.SetErr(b)
 
 	// Set up command arguments
 	cmd.SetArgs([]string{"rsec://000000000000/sm.aws/test/api/keys?region=us-east-1"})
@@ -41,6 +42,7 @@ func TestCopyCommand_Azure(t *testing.T) {
 	// Capture output
 	b := bytes.NewBufferString("")
 	cmd.SetOut(b)
+	cmd.SetErr(b)
 
 	// Set up command arguments
 	cmd.SetArgs([]string{"rsec://rsec-test/kv.azure/basic-secret"})
@@ -67,6 +69,7 @@ func TestCopyCommand_HashiCreds(t *testing.T) {
 	// Capture output
 	b := bytes.NewBufferString("")
 	cmd.SetOut(b)
+	cmd.SetErr(b)
 
 	// Set up command arguments
 	cmd.SetArgs([]string{"rsec://database/cred.hashi/readonly?endpoint=http%3A%2F%2Flocalhost%3A8200"})
@@ -93,6 +96,7 @@ func TestCopyCommand_HashiKVv2(t *testing.T) {
 	// Capture output
 	b := bytes.NewBufferString("")
 	cmd.SetOut(b)
+	cmd.SetErr(b)
 
 	// Set up command arguments
 	cmd.SetArgs([]string{"rsec://secret/kv2.hashi/my-secret?endpoint=http%3A%2F%2Flocalhost%3A8200"})
@@ -115,6 +119,7 @@ func TestCopyCommand_MissingArgument(t *testing.T) {
 	// Capture output
 	b := bytes.NewBufferString("")
 	cmd.SetOut(b)
+	cmd.SetErr(b)
 
 	// Execute command with no arguments
 	err := cmd.Execute()
@@ -126,6 +131,28 @@ func TestCopyCommand_MissingArgument(t *testing.T) {
 	require.NoError(err)
 }
 
+func TestCopyCommand_InvalidSecretRef(t *testing.T) {
+	require := require.New(t)
+	cmd := NewCopyCmd()
+
+	// Capture output
+	b := bytes.NewBufferString("")
+	cmd.SetOut(b)
+	cmd.SetErr(b)
+
+	// Set up invalid secret reference
+	cmd.SetArgs([]string{"invalid-secret-ref"})
+
+	// Execute command
+	err := cmd.Execute()
+	require.NoError(err)
+
+	// Ensure output indicates invalid reference
+	out, err := io.ReadAll(b)
+	require.NoError(err)
+	assert.Contains(t, string(out), "❌ - Invalid secret reference provided!")
+}
+
 func TestRunCommand(t *testing.T) {
 	t.Skip("GitHub Actions doesn't like pty")
 	require := require.New(t)
@@ -135,6 +162,7 @@ func TestRunCommand(t *testing.T) {
 	// Capture output
 	b := bytes.NewBufferString("")
 	cmd.SetOut(b)
+	cmd.SetErr(b)
 
 	// Set up command arguments
 	cmd.SetArgs([]string{"--", "echo", "password1234"})
@@ -167,6 +195,7 @@ func TestRunCommand_Azure(t *testing.T) {
 	// Capture output
 	b := bytes.NewBufferString("")
 	cmd.SetOut(b)
+	cmd.SetErr(b)
 
 	// Set up command arguments
 	cmd.SetArgs([]string{"--", "echo", "password1234"})
@@ -198,6 +227,7 @@ func TestRefCommand_AwsRef(t *testing.T) {
 	// Capture output
 	b := bytes.NewBufferString("")
 	cmd.SetOut(b)
+	cmd.SetErr(b)
 
 	// Set up command arguments
 	cmd.SetArgs([]string{"rsec://000000000000/sm.aws/test/api/keys?region=us-east-1"})
@@ -224,6 +254,7 @@ func TestRefCommand_AzureArn(t *testing.T) {
 	// Capture output
 	b := bytes.NewBufferString("")
 	cmd.SetOut(b)
+	cmd.SetErr(b)
 
 	// Set up command arguments
 	cmd.SetArgs([]string{"https://myvaultname.vault.azure.net/secrets/mysecretname/"})
@@ -250,6 +281,7 @@ func TestRefCommand_AzureRef(t *testing.T) {
 	// Capture output
 	b := bytes.NewBufferString("")
 	cmd.SetOut(b)
+	cmd.SetErr(b)
 
 	// Set up command arguments
 	cmd.SetArgs([]string{"rsec://myvaultname/kv.azure/mysecretname"})
@@ -276,6 +308,7 @@ func TestRefCommand_HashiKVv2Url(t *testing.T) {
 	// Capture output
 	b := bytes.NewBufferString("")
 	cmd.SetOut(b)
+	cmd.SetErr(b)
 
 	// Set up command arguments
 	cmd.SetArgs([]string{"http://localhost:8200/v1/secret/data/my-secret"})
@@ -302,6 +335,7 @@ func TestRefCommand_HashiCredentialUrl(t *testing.T) {
 	// Capture output
 	b := bytes.NewBufferString("")
 	cmd.SetOut(b)
+	cmd.SetErr(b)
 
 	// Set up command arguments
 	cmd.SetArgs([]string{"http://localhost:8200/v1/database/creds/readonly"})
@@ -328,6 +362,7 @@ func TestRefCommand_HashiRef(t *testing.T) {
 	// Capture output
 	b := bytes.NewBufferString("")
 	cmd.SetOut(b)
+	cmd.SetErr(b)
 
 	// Set up command arguments
 	cmd.SetArgs([]string{"rsec://secret/kv2.hashi/my-secret?endpoint=http%3A%2F%2Flocalhost%3A8200"})
@@ -354,6 +389,7 @@ func TestRefCommand_HashiRef_NoEndpoint(t *testing.T) {
 	// Capture output
 	b := bytes.NewBufferString("")
 	cmd.SetOut(b)
+	cmd.SetErr(b)
 
 	// Set up command arguments
 	cmd.SetArgs([]string{"rsec://secret/kv2.hashi/my-secret"})
@@ -370,4 +406,26 @@ func TestRefCommand_HashiRef_NoEndpoint(t *testing.T) {
 		"Secret Reference:  rsec://secret/kv2.hashi/my-secret\nVault Address:\t   <VAULT_ADDR>/v1/secret/data/my-secret\n",
 		string(out),
 	)
+}
+
+func TestRefCommand_InvalidIdentifier(t *testing.T) {
+	require := require.New(t)
+	cmd := NewRefCmd()
+
+	// Capture output
+	b := bytes.NewBufferString("")
+	cmd.SetOut(b)
+	cmd.SetErr(b)
+
+	// Set up invalid identifier
+	cmd.SetArgs([]string{"invalid-identifier"})
+
+	// Execute command
+	err := cmd.Execute()
+	require.NoError(err)
+
+	// Ensure output indicates invalid identifier
+	out, err := io.ReadAll(b)
+	require.NoError(err)
+	assert.Contains(t, string(out), "Invalid secret identifier")
 }
