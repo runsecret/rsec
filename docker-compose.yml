@@ -37,5 +37,6 @@ services:
     depends_on:
       - hashicorp-vault
     volumes:
+      - ./local/vault/admin-policy.hcl:/usr/local/bin/admin-policy.hcl
       - ./local/vault/init-vault.sh:/usr/local/bin/init-vault.sh
     command: ["sh", "-c", "/usr/local/bin/init-vault.sh"]

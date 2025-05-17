@@ -61,6 +61,9 @@ func TestCopyCommand_HashiCreds(t *testing.T) {
 	assert := assert.New(t)
 	cmd := NewCopyCmd()
 
+	// Set token in env var
+	os.Setenv("VAULT_TOKEN", "dev-only-token")
+
 	// Capture output
 	b := bytes.NewBufferString("")
 	cmd.SetOut(b)
@@ -83,6 +86,9 @@ func TestCopyCommand_HashiKVv2(t *testing.T) {
 	require := require.New(t)
 	assert := assert.New(t)
 	cmd := NewCopyCmd()
+
+	// Set token in env var
+	os.Setenv("VAULT_TOKEN", "dev-only-token")
 
 	// Capture output
 	b := bytes.NewBufferString("")
