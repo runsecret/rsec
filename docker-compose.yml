@@ -21,8 +21,19 @@ services:
       - "8200:8200" # Vault API
     environment:
       - VAULT_DEV_ROOT_TOKEN_ID=dev-only-token
+  postgres:
+    container_name: "postgres"
+    image: postgres:latest
+    ports:
+      - "5432:5432" # PostgreSQL
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    volumes:
+      - ./local/postgres:/docker-entrypoint-initdb.d
   vault-prepopulate:
-    image: alpine/curl
+    image: hashicorp/vault:latest
     depends_on:
       - hashicorp-vault
     volumes:

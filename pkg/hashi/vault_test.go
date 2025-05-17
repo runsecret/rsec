@@ -19,7 +19,7 @@ func TestHashiVault_GetKv1Secret_Success(t *testing.T) {
 	hv := &Vault{client: mockVaultClient}
 
 	// Setup secret reference
-	secretRef := secretref.New("vault", secretref.VaultTypeHashicorpVaultKv2, "secret/my-project")
+	secretRef := secretref.New("vault", secretref.VaultTypeHashicorpVaultKv2, "secret/my-secret")
 
 	secret, err := hv.GetKv1Secret(secretRef)
 	require.NoError(t, err)
@@ -33,7 +33,7 @@ func TestHashiVault_GetKv1Secret_ErrorFetchingSecret(t *testing.T) {
 	hv := &Vault{client: mockVaultClient}
 
 	// Setup secret reference
-	secretRef := secretref.New("vault", secretref.VaultTypeHashicorpVaultKv2, "secret/my-project")
+	secretRef := secretref.New("vault", secretref.VaultTypeHashicorpVaultKv2, "secret/my-secret")
 
 	_, err := hv.GetKv1Secret(secretRef)
 	require.Error(t, err)
@@ -41,7 +41,7 @@ func TestHashiVault_GetKv1Secret_ErrorFetchingSecret(t *testing.T) {
 }
 
 func TestHashiVault_GetKv2Secret_Success(t *testing.T) {
-	mockData := map[string]interface{}{
+	mockData := map[string]any{
 		"password": "test-password",
 	}
 	mockKVClient := &mockHashiKVClient{mockData: mockData, mockErr: nil}
@@ -50,7 +50,7 @@ func TestHashiVault_GetKv2Secret_Success(t *testing.T) {
 	hv := &Vault{client: mockVaultClient}
 
 	// Setup secret reference
-	secretRef := secretref.New("vault", secretref.VaultTypeHashicorpVaultKv2, "secret/my-project")
+	secretRef := secretref.New("vault", secretref.VaultTypeHashicorpVaultKv2, "secret/my-secret")
 
 	secret, err := hv.GetKv2Secret(secretRef)
 	require.NoError(t, err)
@@ -64,7 +64,7 @@ func TestHashiVault_GetKv2Secret_ErrorFetchingSecret(t *testing.T) {
 	hv := &Vault{client: mockVaultClient}
 
 	// Setup secret reference
-	secretRef := secretref.New("vault", secretref.VaultTypeHashicorpVaultKv2, "secret/my-project")
+	secretRef := secretref.New("vault", secretref.VaultTypeHashicorpVaultKv2, "secret/my-secret")
 
 	_, err := hv.GetKv2Secret(secretRef)
 	require.Error(t, err)
@@ -72,7 +72,7 @@ func TestHashiVault_GetKv2Secret_ErrorFetchingSecret(t *testing.T) {
 }
 
 func TestHashiVault_GetCredentials_Success(t *testing.T) {
-	mockData := map[string]interface{}{
+	mockData := map[string]any{
 		"username": "db_username",
 	}
 	mockLogicalClient := &mockHashiLogicalClient{mockData: mockData, mockErr: nil}
@@ -81,7 +81,7 @@ func TestHashiVault_GetCredentials_Success(t *testing.T) {
 	hv := &Vault{client: mockVaultClient}
 
 	// Setup secret reference
-	secretRef := secretref.New("vault", secretref.VaultTypeHashicorpVaultKv2, "secret/my-project")
+	secretRef := secretref.New("vault", secretref.VaultTypeHashicorpVaultKv2, "secret/my-secret")
 
 	secret, err := hv.GetCredential(secretRef)
 	require.NoError(t, err)
@@ -95,7 +95,7 @@ func TestHashiVault_GetCredential_ErrorFetchingSecret(t *testing.T) {
 	hv := &Vault{client: mockVaultClient}
 
 	// Setup secret reference
-	secretRef := secretref.New("vault", secretref.VaultTypeHashicorpVaultKv2, "secret/my-project")
+	secretRef := secretref.New("vault", secretref.VaultTypeHashicorpVaultKv2, "secret/my-secret")
 
 	_, err := hv.GetCredential(secretRef)
 	require.Error(t, err)

@@ -56,7 +56,7 @@ func TestCopyCommand_Azure(t *testing.T) {
 	assert.Equal("✓ - Secret copied to clipboard!\n", string(out))
 }
 
-func TestCopyCommand_Hashi(t *testing.T) {
+func TestCopyCommand_HashiCreds(t *testing.T) {
 	require := require.New(t)
 	assert := assert.New(t)
 	cmd := NewCopyCmd()
@@ -66,7 +66,30 @@ func TestCopyCommand_Hashi(t *testing.T) {
 	cmd.SetOut(b)
 
 	// Set up command arguments
-	cmd.SetArgs([]string{"rsec://secret/kv2.hashi/my-project?endpoint=http%3A%2F%2Flocalhost%3A8200"})
+	cmd.SetArgs([]string{"rsec://database/cred.hashi/readonly?endpoint=http%3A%2F%2Flocalhost%3A8200"})
+
+	// Execute command
+	err := cmd.Execute()
+	// Expect no error
+	require.NoError(err)
+
+	// Ensure output is as expected
+	out, err := io.ReadAll(b)
+	require.NoError(err)
+	assert.Equal("✓ - Secret copied to clipboard!\n", string(out))
+}
+
+func TestCopyCommand_HashiKVv2(t *testing.T) {
+	require := require.New(t)
+	assert := assert.New(t)
+	cmd := NewCopyCmd()
+
+	// Capture output
+	b := bytes.NewBufferString("")
+	cmd.SetOut(b)
+
+	// Set up command arguments
+	cmd.SetArgs([]string{"rsec://secret/kv2.hashi/my-secret?endpoint=http%3A%2F%2Flocalhost%3A8200"})
 
 	// Execute command
 	err := cmd.Execute()
@@ -239,7 +262,7 @@ func TestRefCommand_AzureRef(t *testing.T) {
 	)
 }
 
-func TestRefCommand_HashiUrl(t *testing.T) {
+func TestRefCommand_HashiKVv2Url(t *testing.T) {
 	require := require.New(t)
 	assert := assert.New(t)
 	cmd := NewRefCmd()
@@ -249,7 +272,7 @@ func TestRefCommand_HashiUrl(t *testing.T) {
 	cmd.SetOut(b)
 
 	// Set up command arguments
-	cmd.SetArgs([]string{"http://localhost:8200/v1/secret/data/my-project"})
+	cmd.SetArgs([]string{"http://localhost:8200/v1/secret/data/my-secret"})
 
 	// Execute command
 	err := cmd.Execute()
@@ -260,7 +283,33 @@ func TestRefCommand_HashiUrl(t *testing.T) {
 	out, err := io.ReadAll(b)
 	require.NoError(err)
 	assert.Equal(
-		"Secret Reference:  rsec://secret/kv2.hashi/my-project?endpoint=http%3A%2F%2Flocalhost%3A8200\nVault Address:\t   http://localhost:8200/v1/secret/data/my-project\n",
+		"Secret Reference:  rsec://secret/kv2.hashi/my-secret?endpoint=http%3A%2F%2Flocalhost%3A8200\nVault Address:\t   http://localhost:8200/v1/secret/data/my-secret\n",
+		string(out),
+	)
+}
+
+func TestRefCommand_HashiCredentialUrl(t *testing.T) {
+	require := require.New(t)
+	assert := assert.New(t)
+	cmd := NewRefCmd()
+
+	// Capture output
+	b := bytes.NewBufferString("")
+	cmd.SetOut(b)
+
+	// Set up command arguments
+	cmd.SetArgs([]string{"http://localhost:8200/v1/database/creds/readonly"})
+
+	// Execute command
+	err := cmd.Execute()
+	// Expect no error
+	require.NoError(err)
+
+	// Ensure output is as expected
+	out, err := io.ReadAll(b)
+	require.NoError(err)
+	assert.Equal(
+		"Secret Reference:  rsec://database/cred.hashi/readonly?endpoint=http%3A%2F%2Flocalhost%3A8200\nVault Address:\t   http://localhost:8200/v1/database/creds/readonly\n",
 		string(out),
 	)
 }
@@ -275,7 +324,7 @@ func TestRefCommand_HashiRef(t *testing.T) {
 	cmd.SetOut(b)
 
 	// Set up command arguments
-	cmd.SetArgs([]string{"rsec://secret/kv2.hashi/my-project?endpoint=http%3A%2F%2Flocalhost%3A8200"})
+	cmd.SetArgs([]string{"rsec://secret/kv2.hashi/my-secret?endpoint=http%3A%2F%2Flocalhost%3A8200"})
 
 	// Execute command
 	err := cmd.Execute()
@@ -286,7 +335,7 @@ func TestRefCommand_HashiRef(t *testing.T) {
 	out, err := io.ReadAll(b)
 	require.NoError(err)
 	assert.Equal(
-		"Secret Reference:  rsec://secret/kv2.hashi/my-project?endpoint=http%3A%2F%2Flocalhost%3A8200\nVault Address:\t   http://localhost:8200/v1/secret/data/my-project\n",
+		"Secret Reference:  rsec://secret/kv2.hashi/my-secret?endpoint=http%3A%2F%2Flocalhost%3A8200\nVault Address:\t   http://localhost:8200/v1/secret/data/my-secret\n",
 		string(out),
 	)
 }
@@ -301,7 +350,7 @@ func TestRefCommand_HashiRef_NoEndpoint(t *testing.T) {
 	cmd.SetOut(b)
 
 	// Set up command arguments
-	cmd.SetArgs([]string{"rsec://secret/kv2.hashi/my-project"})
+	cmd.SetArgs([]string{"rsec://secret/kv2.hashi/my-secret"})
 
 	// Execute command
 	err := cmd.Execute()
@@ -312,7 +361,7 @@ func TestRefCommand_HashiRef_NoEndpoint(t *testing.T) {
 	out, err := io.ReadAll(b)
 	require.NoError(err)
 	assert.Equal(
-		"Secret Reference:  rsec://secret/kv2.hashi/my-project\nVault Address:\t   <VAULT_ADDR>/v1/secret/data/my-project\n",
+		"Secret Reference:  rsec://secret/kv2.hashi/my-secret\nVault Address:\t   <VAULT_ADDR>/v1/secret/data/my-secret\n",
 		string(out),
 	)
 }
