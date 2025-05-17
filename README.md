@@ -262,7 +262,8 @@ rsec://myvault/kv.azure.cn/MySecret?version=1.0
 rsec://myvault/kv.azure.us/MySecret?version=1.0
 
 # Azure Germany
-rsec
+rsec://myvault/kv.azure.de/MySecret?version=1.0
+```
 
 ### Hashicorp Vault
 
@@ -312,8 +313,6 @@ Or with PowerShell:
 ```powershell
 iwr -useb https://raw.githubusercontent.com/runsecret/rsec/main/scripts/uninstall.ps1 | iex
 ```
-
-
 
 ## Contributing
 
