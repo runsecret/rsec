@@ -19,7 +19,7 @@ RunSecret (rsec) is a CLI tool that simplifies secret management for local devel
 - [Supported Secret Vaults](#supported-secret-vaults)
   - [AWS Secrets Manager](#aws-secrets-manager)
   - [Azure Key Vault](#azure-key-vault)
-  - [Hashicorp Vault](#hashicorp-vault)
+  - [HashiCorp Vault](#hashicorp-vault)
   - [Upcoming Vault Support (Roadmap)](#upcoming-vault-support-roadmap)
 - [Uninstalling](#uninstalling)
 - [Contributing](#contributing)
@@ -39,9 +39,9 @@ It's generally a pain for the developers, and a security risk for the company. R
 
 ## How It Works
 
-RunSecret uses **secret references** to solve these problems. Think of these as pointers that replace the secrets themselves. To use RunSercet you simply:
+RunSecret uses **secret references** to solve these problems. Think of these as pointers that replace the secrets themselves. To use RunSecret you simply:
 
-1. Update your environment variabes or `.env` files with references to secrets (not the secrets themselves)
+1. Update your environment variables or `.env` files with references to secrets (not the secrets themselves)
 2. Use `rsec run` to inject actual secret values from your vault at runtime
 3. Continue using your existing development workflow with no code changes!
 
@@ -50,7 +50,7 @@ RunSecret uses **secret references** to solve these problems. Think of these as 
 - ✅ **Easy Setup**: Works with existing `.env` files and environment variables
 - ✅ **Team-Friendly**: `.env` files can be safely committed to git, making team onboarding/offboarding a breeze
 - ✅ **Vault Agnostic**: Works with multiple secret storage solutions, with more on the way
-- ✅ **Secure**: Leverages your existing vault permissions so only the who need access to secrets can get them
+- ✅ **Secure**: Leverages your existing vault permissions so only those who need access to secrets can get them
 - ✅ **Leak Prevention**: Automatically redacts secret values in logs and console output
 
 ## Installation
@@ -83,7 +83,7 @@ iwr -useb https://raw.githubusercontent.com/runsecret/rsec/main/scripts/install.
 
 1. **Authenticate with your secret vault**
 
-   Ensure your local machine is authenticated with your secrets vault. This can vary by vault provider, but often requires loging in via a provided CLI.
+   Ensure your local machine is authenticated with your secrets vault. This can vary by vault provider, but often requires logging in via a provided CLI.
 
 2. **Replace static secrets with references**
 
@@ -265,9 +265,9 @@ rsec://myvault/kv.azure.us/MySecret?version=1.0
 rsec://myvault/kv.azure.de/MySecret?version=1.0
 ```
 
-### Hashicorp Vault
+### HashiCorp Vault
 
-Supports both versions of the KV secret engine (v1 and v2) and credential-based secret enginees such as database, aws, rabbitmq, etc.
+Supports both versions of the KV secret engine (v1 and v2) and credential-based secret engines such as database, AWS, RabbitMQ, etc.
 
 **Authentication:**
 - Currently supports token-based authentication via one of the following methods:
