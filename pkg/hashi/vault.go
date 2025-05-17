@@ -53,8 +53,10 @@ func (h *Vault) getClient(ref secretref.SecretReference) VaultClientAPI {
 			log.Fatalf("Cannot connect to HashiCorp Vault client: %s", err)
 		}
 
-		// TODO: Replace with real auth
-		client.SetToken("dev-only-token")
+		err = authenticateWithToken(client)
+		if err != nil {
+			log.Fatalf("Failed to authenticate with Vault: %s", err)
+		}
 
 		h.client = &vaultClientWrapper{client: client}
 	}

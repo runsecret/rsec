@@ -17,6 +17,10 @@ RunSecret (rsec) is a CLI tool that simplifies secret management for local devel
 - [Complete Example](#complete-example)
 - [Commands Reference](#commands-reference)
 - [Supported Secret Vaults](#supported-secret-vaults)
+  - [AWS Secrets Manager](#aws-secrets-manager)
+  - [Azure Key Vault](#azure-key-vault)
+  - [HashiCorp Vault](#hashicorp-vault)
+  - [Upcoming Vault Support (Roadmap)](#upcoming-vault-support-roadmap)
 - [Uninstalling](#uninstalling)
 - [Contributing](#contributing)
 - [License](#license)
@@ -35,9 +39,9 @@ It's generally a pain for the developers, and a security risk for the company. R
 
 ## How It Works
 
-RunSecret uses **secret references** to solve these problems. Think of these as pointers that replace the secrets themselves. To use RunSercet you simply:
+RunSecret uses **secret references** to solve these problems. Think of these as pointers that replace the secrets themselves. To use RunSecret you simply:
 
-1. Update your environment variabes or `.env` files with references to secrets (not the secrets themselves)
+1. Update your environment variables or `.env` files with references to secrets (not the secrets themselves)
 2. Use `rsec run` to inject actual secret values from your vault at runtime
 3. Continue using your existing development workflow with no code changes!
 
@@ -46,7 +50,7 @@ RunSecret uses **secret references** to solve these problems. Think of these as 
 - ✅ **Easy Setup**: Works with existing `.env` files and environment variables
 - ✅ **Team-Friendly**: `.env` files can be safely committed to git, making team onboarding/offboarding a breeze
 - ✅ **Vault Agnostic**: Works with multiple secret storage solutions, with more on the way
-- ✅ **Secure**: Leverages your existing vault permissions so only the who need access to secrets can get them
+- ✅ **Secure**: Leverages your existing vault permissions so only those who need access to secrets can get them
 - ✅ **Leak Prevention**: Automatically redacts secret values in logs and console output
 
 ## Installation
@@ -79,7 +83,7 @@ iwr -useb https://raw.githubusercontent.com/runsecret/rsec/main/scripts/install.
 
 1. **Authenticate with your secret vault**
 
-   Ensure your local machine is authenticated with your secrets vault. This can vary by vault provider, but often requires loging in via a provided CLI.
+   Ensure your local machine is authenticated with your secrets vault. This can vary by vault provider, but often requires logging in via a provided CLI.
 
 2. **Replace static secrets with references**
 
@@ -130,48 +134,7 @@ Secret Reference:  rsec://012345678912/sm.aws/MyTestSecret?region=us-east-1
 Vault Address: arn:aws:secretsmanager:us-east-1:012345678912:secret:MyDatabasePassword
 ```
 
-### AWS Secrets Manager
-
-Being more specific from the general format defined above, all AWS Secrets Manager references are constructed with the following values:
-```bash
-rsec://<accountNumber>/sm.aws/<secretName>?region=<region>
-```
-
-The `region` attribute is currently only applicable to AWS Secrets Manager references, and will appear on all secret references for this provider.
-
-Example:
-```
-rsec://012345678912/sm.aws/DatabasePassword?region=us-east-1
-```
-
-### Azure Key Vault
-For Azure Key Vault, the reference format is:
-```bash
-rsec://<vaultAddress>/kv.azure/<secretName>?<arguments>
-```
-
-Where:
-* `vaultAddress`: The name of the Azure Key Vault (e.g. if using `https://myvault.vault.azure.net/` then `myvault` is the vault address)
-* `secretName`: The name of the secret in the Azure Key Vault
-* `arguments`: Optional arguments, such as `version` to specify a specific version of the secret.
-
-Example:
-```
-rsec://myvault/kv.azure/MySecret?version=1.0
-```
-
-**Using Azure China/Azure Government/Azure Germany**
-If you are using Azure China, Azure Government, or Azure Germany, you can use `rsec` in the same way described above, but will replace the `kv.azure` with a region-specific value. For example, for Azure China, you would use `kv.azure.cn` instead of `kv.azure`. Example secret references for each Azure region is as follows:
-```bash
-# Azure China
-rsec://myvault/kv.azure.cn/MySecret?version=1.0
-
-# Azure Government
-rsec://myvault/kv.azure.us/MySecret?version=1.0
-
-# Azure Germany
-rsec://myvault/kv.azure.de/MySecret?version=1.0
-```
+For examples specific to your vault provider, see the [Supported Secret Vaults](#supported-secret-vaults) section.
 
 ## Complete Example
 
@@ -254,18 +217,84 @@ rsec ref arn:aws:secretsmanager:us-east-1:012345678912:secret:MyApiKey
 **Limitations:**
 - Only supports string values (not binary)
 
+**Secret Reference Format**
+All AWS Secrets Manager references are constructed with the following values:
+```bash
+rsec://<accountNumber>/sm.aws/<secretName>?region=<region>
+```
+
+The `region` attribute is currently only applicable to AWS Secrets Manager references, and will appear on all secret references for this provider.
+
+Example:
+```
+rsec://012345678912/sm.aws/DatabasePassword?region=us-east-1
+```
+
 ### Azure Key Vault
 
 **Authentication:**
 - Uses standard Azure SDK authentication
 - Supports Azure CLI, Managed Identity, Service Principal
 
+**Secret Reference Format**
+For Azure Key Vault, the reference format is:
+```bash
+rsec://<vaultAddress>/kv.azure/<secretName>?<arguments>
+```
+
+Where:
+* `vaultAddress`: The name of the Azure Key Vault (e.g. if using `https://myvault.vault.azure.net/` then `myvault` is the vault address)
+* `secretName`: The name of the secret in the Azure Key Vault
+* `arguments`: Optional arguments, such as `version` to specify a specific version of the secret.
+
+Example:
+```
+rsec://myvault/kv.azure/MySecret?version=1.0
+```
+
+**Using Azure China/Azure Government/Azure Germany**
+If you are using Azure China, Azure Government, or Azure Germany, you can use `rsec` in the same way described above, but will replace the `kv.azure` with a region-specific value. For example, for Azure China, you would use `kv.azure.cn` instead of `kv.azure`. Example secret references for each Azure region is as follows:
+```bash
+# Azure China
+rsec://myvault/kv.azure.cn/MySecret?version=1.0
+
+# Azure Government
+rsec://myvault/kv.azure.us/MySecret?version=1.0
+
+# Azure Germany
+rsec://myvault/kv.azure.de/MySecret?version=1.0
+```
+
+### HashiCorp Vault
+
+Supports both versions of the KV secret engine (v1 and v2) and credential-based secret engines such as database, AWS, RabbitMQ, etc.
+
+**Authentication:**
+- Currently supports token-based authentication via one of the following methods:
+  - The `VAULT_TOKEN` environment variable
+  - Tokens set in the `~/.vault-token` file (via userpass authentication)
+
+**Limitations**
+- Currently returns the entire secret object, not just the value. This will be addressed in [issue #8](https://github.com/runsecret/rsec/issues/8).
+
+**Secret Reference Format**
+For HashiCorp Vault, the reference format may look like one of the following:
+```bash
+rsec://<mountPath>/kv1.hashi/<secretName>?<arguments>
+rsec://<mountPath>/kv2.hashi/<secretName>?<arguments>
+rsec://<mountPath>/cred.hashi/<secretName>?<arguments>
+```
+
+Where:
+* `mountPath`: The path where the secret or credential is mounted in HashiCorp Vault.
+* `secretName`: The name of the secret in HashiCorp Vault
+* `arguments`: Optional arguments
+  * `endpoint`: The URL encoded endpoint to the HashiCorp Vault server (e.g. `https://vault.example.com`). If not set, will default to the `VAULT_ADDR` environment variable.
+
 
 ### Upcoming Vault Support (Roadmap)
 - GCP Secret Manager
 - AWS Parameter Store
-- HashiCorp Vault
-
 
 ## Uninstalling
 We recommend using the same method you used to install RunSecret to uninstall it. For example, if you installed it with Homebrew, you can uninstall it with:
@@ -284,8 +313,6 @@ Or with PowerShell:
 ```powershell
 iwr -useb https://raw.githubusercontent.com/runsecret/rsec/main/scripts/uninstall.ps1 | iex
 ```
-
-
 
 ## Contributing
 

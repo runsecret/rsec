@@ -16,8 +16,16 @@ func TestConvertAwsArnToRef(t *testing.T) {
 }
 
 func TestConvertHashiURLToRef_KV2(t *testing.T) {
-	testArn := "http://localhost:8200/v1/secret/data/my-project"
-	expectedRef := "rsec://secret/kv2.hashi/my-project?endpoint=http%3A%2F%2Flocalhost%3A8200"
+	testArn := "http://localhost:8200/v1/secret/data/my-secret"
+	expectedRef := "rsec://secret/kv2.hashi/my-secret?endpoint=http%3A%2F%2Flocalhost%3A8200"
+	ref, err := ConvertHashicorpVaultURLToRef(testArn)
+	require.NoError(t, err)
+	assert.Equal(t, expectedRef, ref)
+}
+
+func TestConvertHashiURLToRef_Creds(t *testing.T) {
+	testArn := "http://localhost:8200/v1/database/creds/my-role"
+	expectedRef := "rsec://database/cred.hashi/my-role?endpoint=http%3A%2F%2Flocalhost%3A8200"
 	ref, err := ConvertHashicorpVaultURLToRef(testArn)
 	require.NoError(t, err)
 	assert.Equal(t, expectedRef, ref)
