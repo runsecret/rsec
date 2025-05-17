@@ -19,7 +19,7 @@ RunSecret (rsec) is a CLI tool that simplifies secret management for local devel
 - [Supported Secret Vaults](#supported-secret-vaults)
   - [AWS Secrets Manager](#aws-secrets-manager)
   - [Azure Key Vault](#azure-key-vault)
-  - [HashiCorp Vault](#hashicorp-vault)
+  - [Hashicorp Vault](#hashicorp-vault)
   - [Upcoming Vault Support (Roadmap)](#upcoming-vault-support-roadmap)
 - [Uninstalling](#uninstalling)
 - [Contributing](#contributing)
@@ -264,7 +264,7 @@ rsec://myvault/kv.azure.us/MySecret?version=1.0
 # Azure Germany
 rsec
 
-### HashiCorp Vault
+### Hashicorp Vault
 
 Supports both versions of the KV secret engine (v1 and v2) and credential-based secret enginees such as database, aws, rabbitmq, etc.
 
