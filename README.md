@@ -134,7 +134,7 @@ Secret Reference:  rsec://012345678912/sm.aws/MyTestSecret?region=us-east-1
 Vault Address: arn:aws:secretsmanager:us-east-1:012345678912:secret:MyDatabasePassword
 ```
 
-For specific examples for your vault provider, see the relevant [Supported Secret Vaults](#supported-secret-vaults) subsection.
+For examples specific to your vault provider, see the [Supported Secret Vaults](#supported-secret-vaults) section.
 
 ## Complete Example
 
